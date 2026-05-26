@@ -1,5 +1,3 @@
-// eslint.config.js
-/* eslint import/no-unresolved: off */
 import js from "@eslint/js";
 import globals from "globals";
 import noSecrets from "eslint-plugin-no-secrets";
@@ -25,7 +23,7 @@ export default [
       parser: tsParser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: "./tsconfig.json",
+        project: "./tsconfig.eslint.json",
       },
       globals: {
         ...globals.browser,
@@ -47,10 +45,12 @@ export default [
       semi: ["error", "always"],
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
+      "react/no-unknown-property": ["error", { ignore: ["intensity", "position", "args", "attach"] }],
       "no-secrets/no-secrets": ["error", { tolerance: 4.2 }],
       "import/no-unresolved": "error",
       "import/named": "error",
        "@typescript-eslint/triple-slash-reference": "off",
+       "no-undef": "off",
     },
     settings: {
       react: { version: "detect" },
@@ -90,6 +90,7 @@ export default [
       semi: ["error", "always"],
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
+      "react/no-unknown-property": ["error", { ignore: ["intensity", "position", "args", "attach"] }],
       "no-secrets/no-secrets": ["error", { tolerance: 4.2 }],
       "import/no-unresolved": "error",
       "import/named": "error",
@@ -107,6 +108,12 @@ export default [
   },
 
   {
-    ignores: ["**/.next/**", "**/node_modules/**"],
+    ignores: [
+      "**/.next/**",
+      "**/node_modules/**",
+      "**/.venv/**",
+      "**/python/**",
+      "**/mobile/**",
+    ],
   },
 ];
