@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@cordystackx/cordy_minikit": "^1.5.15",
     "next": "16.2.6",
     "react": "19.1.0",
     "react-dom": "19.1.0"
