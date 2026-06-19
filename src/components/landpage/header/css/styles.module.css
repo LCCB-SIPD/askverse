@@ -1,0 +1,37 @@
+.container {
+  width: 100%;
+  height: auto;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0 auto;
+  width: min(100%, var(--max-width));
+}
+
+.logo {
+  width: 10%;
+  height: auto;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.nav_bar {
+  width: 40%;
+  height: auto;
+}
+.nav_bar ul {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: auto;
+  width: 100%;
+}
+
+.buttons_contain {
+  width: 20%;
+  height: auto;
+}
