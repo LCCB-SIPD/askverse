@@ -21,10 +21,11 @@ export default function Sign_in() {
 
   useEffect(() => {
     if (
-      (context === "NONE")
+      (context === "NONE" || context === "MULTI")
     ) {
       return;
     }
+    
 
     const signIn = async () => {
       setLoading(true);

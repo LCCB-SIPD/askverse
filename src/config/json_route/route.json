@@ -1,6 +1,7 @@
 {
   "auth" : {
-    "sign_in" : "/services/supabase/auth"
+    "sign_in" : "/services/supabase/auth",
+    "update" : "/services/supabase/update"
   },
   "info" : {
     "retrieve" : "/services/supabase/retrieve"

@@ -81,6 +81,7 @@
   margin-top: 0.8rem;
   color: rgba(255, 255, 255, 0.84);
   line-height: 1.7;
+  white-space: pre-wrap;
 }
 
 .question_chip {

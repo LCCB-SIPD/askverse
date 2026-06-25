@@ -50,7 +50,7 @@ export default function Content_feed({ acc_address, displayName, context } : Con
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
   const [replyDraft, setReplyDraft] = useState("");
-  const [giftTarget, setGiftTarget] = useState<{ questionId: number; acc_address: string, author: string } | null>(null);
+  const [giftTarget, setGiftTarget] = useState<{ questionId: number; acc_address: string, author: string, context: string } | null>(null);
   const [giftAmount, setGiftAmount] = useState<(typeof GIFT_AMOUNTS)[number]>(100);
   const [giftNote, setGiftNote] = useState("");
   const [loading, setLoading] = useState(false);
@@ -127,8 +127,8 @@ export default function Content_feed({ acc_address, displayName, context } : Con
 
   };
 
-  const handleOpenGift = (questionId: number, acc_address: string, author: string) => {
-    setGiftTarget({ questionId, acc_address, author });
+  const handleOpenGift = (questionId: number, acc_address: string, author: string, context: string) => {
+    setGiftTarget({ questionId, acc_address, author, context });
     setGiftAmount(100);
     setGiftNote("");
   };
@@ -138,12 +138,17 @@ export default function Content_feed({ acc_address, displayName, context } : Con
     
     if (context !== "Non-EVM") return alert("Invalid Wallet Please use Non-EVMs Wallets");
 
+    if (giftTarget.context === "EVM") return alert("Invalid User Wallet, User not supported Non-EVMs Wallets");
+
+    setLoading(true);
     const response = await CordyStackTransStellar(giftTarget.acc_address, giftAmount, { memo: giftNote });
 
     if (response) {
       alert("Send Gift Successfully to " + giftTarget.author);
+      setLoading(false);
     } else {
       alert("Something went wrong");
+      setLoading(false);
     }
 
     setFeedItems((current) =>
@@ -190,7 +195,7 @@ export default function Content_feed({ acc_address, displayName, context } : Con
               <div className={styles.post_head}>
                 <div>
                   <strong>{item.acc_address === acc_address ? "Your Question" : item.author}</strong>
-                  <p>{item.question}</p>
+                  <p style={{ marginTop: "1rem" }}>{item.question}</p>
                 </div>
                 <span>{formatTimeAgo(item.time)}</span>
               </div>
@@ -207,7 +212,7 @@ export default function Content_feed({ acc_address, displayName, context } : Con
                   setRefresh(true);
                 }} type="button" className={styles.heart_button}>
                   <HeartIcon active />
-                  <span >Heart {item.hearts}</span>
+                  <span >{loading ? "Loading..." : (`Heart ${item.hearts}`)}</span>
                 </button>
               </div>
             </article>
@@ -253,16 +258,16 @@ export default function Content_feed({ acc_address, displayName, context } : Con
                 ).map((answer) => (
                   <article key={`${answer.id}-${answer.author}`} className={styles.answer_item}>
                     <div className={styles.answer_item_head}>
-                      <strong>{answer.acc_address === acc_address ? "You" : answer.author}</strong>
+                      <strong>{answer.acc_address === acc_address ? "You" : answer.author + " " + answer.context + " Wallets"}</strong>
                       <span>{formatTimeAgo(answer.time)}</span>
                     </div>
-                    <p>{answer.body}</p>
+                    <p style={{ whiteSpace: "pre-line" }} >{answer.body}</p>
                     {answer.acc_address !== acc_address && (
                       <div className={styles.answer_item_footer}>
                         <button
                           type="button"
                           className={styles.gift_button}
-                          onClick={() => handleOpenGift(activeQuestion.id, answer.acc_address, answer.author)}
+                          onClick={() => handleOpenGift(activeQuestion.id, answer.acc_address, answer.author, answer.context)}
                         >
                           Gift XLM
                         </button>
@@ -310,7 +315,7 @@ export default function Content_feed({ acc_address, displayName, context } : Con
                 <div className={styles.gift_panel_actions}>
                   <button type="button" onClick={() => setGiftTarget(null)}>Cancel</button>
                   <button type="button" onClick={handleSubmitGift}>
-                    Send {giftAmount} XLM
+                    {loading ? "Sending..." : (`Send ${giftAmount} XLM`) }
                   </button>
                 </div>
               </div>

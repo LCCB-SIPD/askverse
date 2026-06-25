@@ -4,6 +4,8 @@ import { useState, Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 import { useDisconnectWallets } from "@cordystackx/cordy_minikit";
 import styles from "./css/styles.module.css";
+import { Fetch_to } from "@/utilities";
+import json_route from "@/config/json_route/route.json";
 
 type Aside_leftProps = {
   username?: string;
@@ -46,7 +48,7 @@ export default function Aside_left({ displayName, username, context, evm, stella
             <div className={styles.avatar}>AV</div>
             <div>
               <strong>{displayName}</strong>
-              <p>{username}</p>
+              <p>@{username}</p>
             </div>
           </button>
           <button type="button" className={styles.burger} aria-label="Open navigation">
@@ -57,7 +59,7 @@ export default function Aside_left({ displayName, username, context, evm, stella
         </div>
         <nav className={styles.nav}>
           <ul>
-            <li onClick={() => {}}>Home</li>
+            <li onClick={() => {}}>Feeds</li>
             <li onClick={() => {}}>My Questions</li>
           </ul>
         </nav>
@@ -108,10 +110,20 @@ export default function Aside_left({ displayName, username, context, evm, stella
             />
 
             <div className={styles.profile_actions}>
-              <button type="button" onClick={() => setProfileOpen(false)}>
-                Update
+              <button disabled={loading} type="button" onClick={async() => {
+                setLoading(true);
+                const response = await Fetch_to(json_route.auth.update, { author: displayName, username, acc_address: context === "EVM" ? evm : stellar });
+                if (response.success) {
+                  setLoading(false);
+                  alert(response.data.message);
+                }else {
+                  setLoading(false);
+                  alert(response.message);
+                }
+              }}>
+                {loading ? "Loading..." : "Update"}
               </button>
-              <button style={{ backgroundColor: "#f00" }} type="button" onClick={() => handleDisconnect()}>
+              <button disabled={loading} style={{ backgroundColor: "#f00" }} type="button" onClick={() => handleDisconnect()}>
                 {loading ? "Loading..." : "Disconnect Logout"}
               </button>
             </div>

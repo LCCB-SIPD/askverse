@@ -38,7 +38,7 @@ export default function Home_page() {
       if (response.success) {
         const result = response.data.message[0];
         setDisplayName(result.author);
-        setUsername("@" + result.username);
+        setUsername(result.username);
       } else {
         router.push("/");
       }
