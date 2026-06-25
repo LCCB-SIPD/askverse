@@ -16,13 +16,14 @@
 * TypeScript
 * CSS Modules
 * PostgreSQL
-* Stellar SDK
+* Wagmi Wallet Integration
 * Stellar Wallet Integration
+* CordyStack CordyMinikit for EVM & Non-EVM
 
 ## 🌐 Live Demo
 
 **Vercel:**
-https://your-vercel-url.vercel.app
+https://askverse-pi.vercel.app/
 
 ## 📷 Screenshots
 
