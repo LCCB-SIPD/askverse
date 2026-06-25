@@ -7,7 +7,7 @@
 * 💬 Ask and answer questions
 * ⭐ Community-driven knowledge sharing
 * 🎁 Send XLM gifts to helpful contributors
-* 👛 Stellar wallet authentication
+* 👛 wallet authentication
 * ⚡ Fast and low-cost transactions using Stellar
 
 ## 🛠️ Tech Stack
