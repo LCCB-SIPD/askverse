@@ -1,7 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import styles from "./css/styles.module.css";
+import { Fetch_to, formatTimeAgo } from "@/utilities";
+import json_route from "@/config/json_route/route.json";
+import { CordyStackTransStellar } from "@cordystackx/cordy_minikit";
 
 type FeedItem = {
   id: number;
@@ -11,85 +14,23 @@ type FeedItem = {
   body: string;
   hearts: number;
   answers: number;
+  acc_address: string;
   answersList: Array<{
     author: string;
     body: string;
     time: string;
     gifts: number;
+    acc_address: string;
+    id: string;
+    context: string;
   }>;
 };
 
-const FEED_ITEMS: FeedItem[] = [
-  {
-    id: 1,
-    author: "ana.dev",
-    time: "2h",
-    question: "How do I get started with Stellar rewards?",
-    body: "I’m building a wallet-friendly app and want to know the cleanest path to reward contributors.",
-    hearts: 124,
-    answers: 12,
-    answersList: [
-      {
-        author: "mira.sol",
-        body: "Start with a simple reward loop: ask, answer, upvote, then issue reputation after validation.",
-        time: "12m",
-        gifts: 2,
-      },
-      {
-        author: "volt.chain",
-        body: "Keep the first version lightweight. A clean Q&A flow is more important than complex token logic.",
-        time: "26m",
-        gifts: 1,
-      },
-    ],
-  },
-  {
-    id: 2,
-    author: "mira.sol",
-    time: "5h",
-    question: "How do verified volunteer records work?",
-    body: "We need a reputation system that feels like proof of helpful work, not just likes.",
-    hearts: 82,
-    answers: 9,
-    answersList: [
-      {
-        author: "askverse.team",
-        body: "Verified contributions become records that strengthen trust across the community.",
-        time: "18m",
-        gifts: 4,
-      },
-      {
-        author: "circuit.one",
-        body: "Treat them as portable reputation. The better the answer, the stronger the signal.",
-        time: "41m",
-        gifts: 3,
-      },
-    ],
-  },
-  {
-    id: 3,
-    author: "volt.chain",
-    time: "9h",
-    question: "What is AskVerse really about?",
-    body: "AskVerse is a decentralized knowledge-to-earn platform where quality answers are rewarded on Stellar.",
-    hearts: 201,
-    answers: 17,
-    answersList: [
-      {
-        author: "ana.dev",
-        body: "It’s about turning good answers into real value instead of invisible effort.",
-        time: "9m",
-        gifts: 5,
-      },
-      {
-        author: "mira.sol",
-        body: "Think Stack Overflow energy with blockchain rewards and community trust signals.",
-        time: "32m",
-        gifts: 2,
-      },
-    ],
-  },
-];
+type Content_feedProps = {
+  acc_address: string;
+  displayName: string;
+  context: string;
+}
 
 function HeartIcon({ active }: { active?: boolean }) {
   return (
@@ -105,18 +46,40 @@ function HeartIcon({ active }: { active?: boolean }) {
 
 const GIFT_AMOUNTS = [100, 250, 500, 1000] as const;
 
-export default function Content_feed() {
-  const [feedItems, setFeedItems] = useState<FeedItem[]>(FEED_ITEMS);
+export default function Content_feed({ acc_address, displayName, context } : Content_feedProps) {
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
   const [replyDraft, setReplyDraft] = useState("");
-  const [giftTarget, setGiftTarget] = useState<{ questionId: number; author: string } | null>(null);
+  const [giftTarget, setGiftTarget] = useState<{ questionId: number; acc_address: string, author: string } | null>(null);
   const [giftAmount, setGiftAmount] = useState<(typeof GIFT_AMOUNTS)[number]>(100);
   const [giftNote, setGiftNote] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
+  useEffect(() => {
+    async function Retrieve() {
+      const response = await Fetch_to(json_route.feeds.retrieve_post);
+
+      if (response.success) {
+        setFeedItems(response.data.message);
+      }
+    }
+    Retrieve();
+  }, [refresh]);
+  
   const activeQuestion = useMemo(
     () => feedItems.find((item) => item.id === activeQuestionId) ?? null,
     [activeQuestionId, feedItems],
   );
+
+  useEffect(() => {
+    async function Answer() {
+      await Fetch_to(json_route.feeds.answer, { id: activeQuestion?.id, answersList: activeQuestion?.answersList });
+      setLoading(false);
+    }
+    Answer();
+  }, [activeQuestion?.answersList]);
+
 
   const handleOpenAnswers = (id: number) => {
     setActiveQuestionId(id);
@@ -130,14 +93,21 @@ export default function Content_feed() {
     setGiftNote("");
   };
 
-  const handleSubmitAnswer = () => {
+  const handleSubmitAnswer = async() => {
     if (!activeQuestion || !replyDraft.trim()) return;
+    setLoading(true);
+    const randomUsername = `user${Math.floor(
+      100000000 + Math.random() * 900000000
+    )}`;
 
     const newAnswer = {
-      author: "you",
+      author: displayName,
       body: replyDraft.trim(),
-      time: "now",
+      time: new Date().toISOString(),
       gifts: 0,
+      acc_address: acc_address,
+      id: randomUsername,
+      context: context
     };
 
     setFeedItems((current) =>
@@ -152,17 +122,29 @@ export default function Content_feed() {
       ),
     );
 
+    
     setReplyDraft("");
+
   };
 
-  const handleOpenGift = (questionId: number, author: string) => {
-    setGiftTarget({ questionId, author });
+  const handleOpenGift = (questionId: number, acc_address: string, author: string) => {
+    setGiftTarget({ questionId, acc_address, author });
     setGiftAmount(100);
     setGiftNote("");
   };
 
-  const handleSubmitGift = () => {
+  const handleSubmitGift = async() => {
     if (!giftTarget) return;
+    
+    if (context !== "Non-EVM") return alert("Invalid Wallet Please use Non-EVMs Wallets");
+
+    const response = await CordyStackTransStellar(giftTarget.acc_address, giftAmount, { memo: giftNote });
+
+    if (response) {
+      alert("Send Gift Successfully to " + giftTarget.author);
+    } else {
+      alert("Something went wrong");
+    }
 
     setFeedItems((current) =>
       current.map((item) => {
@@ -171,7 +153,7 @@ export default function Content_feed() {
         return {
           ...item,
           answersList: item.answersList.map((answer) =>
-            answer.author === giftTarget.author
+            answer.author === giftTarget.acc_address
               ? { ...answer, gifts: answer.gifts + 1 }
               : answer,
           ),
@@ -199,29 +181,36 @@ export default function Content_feed() {
       </div>
 
       <div className={styles.feed}>
-        {feedItems.map((item) => (
-          <article className={styles.post} key={item.id}>
-            <div className={styles.post_head}>
-              <div>
-                <strong>{item.author}</strong>
-                <p>{item.question}</p>
+        {[...feedItems]
+          .sort(
+            (a, b) =>
+              new Date(b.time).getTime() - new Date(a.time).getTime()
+          ).map((item) => (
+            <article className={styles.post} key={item.id}>
+              <div className={styles.post_head}>
+                <div>
+                  <strong>{item.acc_address === acc_address ? "Your Question" : item.author}</strong>
+                  <p>{item.question}</p>
+                </div>
+                <span>{formatTimeAgo(item.time)}</span>
               </div>
-              <span>{item.time}</span>
-            </div>
 
-            <p className={styles.post_body}>{item.body}</p>
-            <div className={styles.question_chip}>Question</div>
+              <p className={styles.post_body}>{item.body}</p>
+              <div className={styles.question_chip}>Question</div>
 
-            <div className={styles.post_footer}>
-              <button type="button" onClick={() => handleOpenAnswers(item.id)}>
-                Answer
-              </button>
-              <button type="button" className={styles.heart_button}>
-                <HeartIcon active />
-                <span>Heart {item.hearts}</span>
-              </button>
-            </div>
-          </article>
+              <div className={styles.post_footer}>
+                <button type="button" onClick={() => handleOpenAnswers(item.id)}>
+                  Show Answers
+                </button>
+                <button onClick={async() => {
+                  await Fetch_to(json_route.feeds.hearts, { id: item.id, acc_address: acc_address });
+                  setRefresh(true);
+                }} type="button" className={styles.heart_button}>
+                  <HeartIcon active />
+                  <span >Heart {item.hearts}</span>
+                </button>
+              </div>
+            </article>
         ))}
       </div>
 
@@ -252,31 +241,38 @@ export default function Content_feed() {
                   placeholder="Write a helpful answer..."
                 />
                 <div className={styles.answer_editor_actions}>
-                  <button type="button" onClick={handleCloseAnswers}>Cancel</button>
-                  <button type="button" onClick={handleSubmitAnswer}>Post Answer</button>
+                  <button type="button" onClick={handleSubmitAnswer}>{loading ? "Submitting" : "Submit"}</button>
                 </div>
               </div>
 
-              {activeQuestion.answersList.map((answer) => (
-                <article key={`${activeQuestion.id}-${answer.author}`} className={styles.answer_item}>
-                  <div className={styles.answer_item_head}>
-                    <strong>{answer.author}</strong>
-                    <span>{answer.time}</span>
-                  </div>
-                  <p>{answer.body}</p>
-                  {answer.author !== "you" && (
-                    <div className={styles.answer_item_footer}>
-                      <button
-                        type="button"
-                        className={styles.gift_button}
-                        onClick={() => handleOpenGift(activeQuestion.id, answer.author)}
-                      >
-                        Gift XLM
-                      </button>
+              {activeQuestion && activeQuestion.answersList?.length > 0 ? (
+                [...activeQuestion.answersList]
+                .sort(
+                  (a, b) =>
+                    new Date(b.time).getTime() - new Date(a.time).getTime()
+                ).map((answer) => (
+                  <article key={`${answer.id}-${answer.author}`} className={styles.answer_item}>
+                    <div className={styles.answer_item_head}>
+                      <strong>{answer.acc_address === acc_address ? "You" : answer.author}</strong>
+                      <span>{formatTimeAgo(answer.time)}</span>
                     </div>
-                  )}
-                </article>
-              ))}
+                    <p>{answer.body}</p>
+                    {answer.acc_address !== acc_address && (
+                      <div className={styles.answer_item_footer}>
+                        <button
+                          type="button"
+                          className={styles.gift_button}
+                          onClick={() => handleOpenGift(activeQuestion.id, answer.acc_address, answer.author)}
+                        >
+                          Gift XLM
+                        </button>
+                      </div>
+                    )}
+                  </article>
+                ))
+              ) : (
+                <h2 style={{ textAlign: "center" }}>No Answer Yet</h2>
+              )}
             </div>
 
             {giftTarget && (
@@ -286,7 +282,6 @@ export default function Content_feed() {
                     <p>Gift creator</p>
                     <h4>{giftTarget.author}</h4>
                   </div>
-                  <button type="button" onClick={() => setGiftTarget(null)}>Close</button>
                 </div>
 
                 <div className={styles.gift_amounts}>

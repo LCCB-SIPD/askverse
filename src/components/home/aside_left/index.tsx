@@ -1,15 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/navigation";
+import { useDisconnectWallets } from "@cordystackx/cordy_minikit";
 import styles from "./css/styles.module.css";
 
+type Aside_leftProps = {
+  username?: string;
+  displayName?: string;
+  context?: string;
+  evm?:string;
+  stellar?:string;
+  setDisplayName: Dispatch<SetStateAction<string>>;
+  setUsername: Dispatch<SetStateAction<string>>;
+}
 
-export default function Aside_left() {
+export default function Aside_left({ displayName, username, context, evm, stellar, setDisplayName, setUsername } : Aside_leftProps) {
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
-  const [displayName, setDisplayName] = useState("AskVerse");
-  const [username, setUsername] = useState("@askverse");
+  const { disconnectAll } = useDisconnectWallets();
+  const [loading, setLoading] = useState(false);
+
+  async function handleDisconnect() {
+    setLoading(true);                                                                            
+    const success = await disconnectAll();                                                                           
+                                                                                                                      
+    if (success) {                                                                                                   
+      console.log("Wallets disconnected");
+      router.push("/");                                                                       
+    }else {                                                                                                         
+      console.log("Failed to disconnect wallets");
+      setLoading(false);
+    }
+  }
 
   return(
     <aside className={styles.container}>
@@ -34,21 +57,10 @@ export default function Aside_left() {
         </div>
         <nav className={styles.nav}>
           <ul>
-            <li onClick={() => router.push("/home")}>Home</li>
-            <li onClick={() => router.push("/home/my-questions")}>My Questions</li>
-            <li onClick={() => router.push("/home/my-answer")}>My Answer</li>
+            <li onClick={() => {}}>Home</li>
+            <li onClick={() => {}}>My Questions</li>
           </ul>
         </nav>
-        <div className={styles.stats}>
-          <article>
-            <span>Questions</span>
-            <strong>1.2K</strong>
-          </article>
-          <article>
-            <span>Answers</span>
-            <strong>8.9K</strong>
-          </article>
-        </div>
       </div>
 
       {profileOpen && (
@@ -64,6 +76,7 @@ export default function Aside_left() {
               <div>
                 <p>Profile</p>
                 <h3>Edit your AskVerse identity</h3>
+                <p>Wallet type: {context}</p>
               </div>
               <button type="button" onClick={() => setProfileOpen(false)}>
                 Close
@@ -86,9 +99,20 @@ export default function Aside_left() {
               onChange={(event) => setUsername(event.target.value)}
             />
 
+            <label htmlFor="acc_address">Wallet Address</label>
+            <input
+              id="acc_address"
+              type="text"
+              value={`${context === "EVM" ? evm : stellar}`}
+              disabled
+            />
+
             <div className={styles.profile_actions}>
-              <button style={{ backgroundColor: "#f00" }} type="button" onClick={() => setProfileOpen(false)}>
-                Disconnect Logout
+              <button type="button" onClick={() => setProfileOpen(false)}>
+                Update
+              </button>
+              <button style={{ backgroundColor: "#f00" }} type="button" onClick={() => handleDisconnect()}>
+                {loading ? "Loading..." : "Disconnect Logout"}
               </button>
             </div>
           </div>

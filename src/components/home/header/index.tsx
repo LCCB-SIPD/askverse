@@ -1,5 +1,6 @@
- "use client";
+"use client";
 
+import { useState } from "react";
 import styles from "./css/styles.module.css";
 
 type HeaderProps = {
@@ -7,6 +8,8 @@ type HeaderProps = {
 };
 
 export default function Header({ onPostQuestionClick }: HeaderProps) {
+  const [searchValue, setSearchValue] = useState("");
+
   return(
     <header className={styles.container}>
       <div className={styles.wrapper}>
@@ -18,10 +21,16 @@ export default function Header({ onPostQuestionClick }: HeaderProps) {
           </div>
         </div>
         <div className={styles.search}>
-          <span>Search AskVerse</span>
+          <input
+            type="search"
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            placeholder="Search AskVerse"
+            aria-label="Search AskVerse"
+          />
         </div>
         <button type="button" className={styles.action} onClick={onPostQuestionClick}>
-          Post Question
+          Ask Question
         </button>
       </div>
     </header>

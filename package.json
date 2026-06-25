@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@cordystackx/cordy_minikit": "^2.0.6",
+    "@supabase/supabase-js": "^2.108.2",
     "@tanstack/react-query": "^5.101.1",
     "next": "16.2.6",
     "react": "19.1.0",

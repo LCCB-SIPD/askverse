@@ -1,5 +1,8 @@
 {
   "auth" : {
     "sign_in" : "/auth/sign-in"
+  },
+  "signed" : {
+    "home" : "/home"
   }
 }

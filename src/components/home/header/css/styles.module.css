@@ -58,6 +58,24 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
+.search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font: inherit;
+}
+
+.search input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.search:focus-within {
+  border-color: rgba(255, 95, 187, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .action {
   justify-self: end;
   min-height: 3.1rem;

@@ -319,7 +319,6 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   z-index: 2;
 }
-
 .gift_panel_head {
   display: flex;
   align-items: flex-start;
@@ -454,7 +453,7 @@
   }
 
   .gift_panel {
-    position: absolute;
+    position: fixed;
     left: 1rem;
     right: 1rem;
     bottom: 1rem;

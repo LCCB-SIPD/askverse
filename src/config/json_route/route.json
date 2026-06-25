@@ -1,0 +1,14 @@
+{
+  "auth" : {
+    "sign_in" : "/services/supabase/auth"
+  },
+  "info" : {
+    "retrieve" : "/services/supabase/retrieve"
+  },
+  "feeds" : {
+    "post" : "/services/supabase/post",
+    "retrieve_post" : "/services/supabase/retrieve_post",
+    "answer" : "/services/supabase/answer",
+    "hearts" : "/services/supabase/hearts"
+  }
+}
