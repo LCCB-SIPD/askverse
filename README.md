@@ -46,7 +46,22 @@ Traditional Q&A platforms reward users with reputation points that have little r
 
 ## 👥 Team
 
-Marc Giestin Louis Cordova (CordyStackX)
+**Marc Giestin Louis Cordova (CordyStackX)**
+Founder & Lead Developer
+
+* Designed the platform architecture
+* Developed the frontend and backend
+* Integrated Stellar wallet authentication
+* Implemented XLM gifting functionality
+* Managed deployment and technical implementation
+
+**Julian Martir**
+Documentation & Presentation
+
+* Prepared project documentation
+* Created the pitch deck
+* Presented the project during the hackathon
+
 
 ## 📄 License
 
