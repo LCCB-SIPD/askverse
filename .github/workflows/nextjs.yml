@@ -29,10 +29,5 @@ jobs:
       - name: Build with Next.js
         run: pnpm run build
         working-directory: ./
-        env:
-          # Secrets
-
-          
-          # Public variables
           
           
