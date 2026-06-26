@@ -25,6 +25,9 @@
 **Vercel:**
 https://askverse-pi.vercel.app/
 
+**Github Repo:**
+https://github.com/LCCB-SIPD/askverse.git
+
 ## 📷 Screenshots
 
 ![AskVerse Screenshot](https://raw.githubusercontent.com/cordyStackX/askverse/main/public/Screenshot_2026-06-26-053351.png)
