@@ -224,7 +224,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
                   
                 }} type="button" className={styles.heart_button}>
                   <HeartIcon active />
-                  <span >Heart {item.hearts}</span>
+                  <span >{item.hearts}</span>
                 </button>
               </div>
             </article>
@@ -258,7 +258,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
                   placeholder="Write a helpful answer..."
                 />
                 <div className={styles.answer_editor_actions}>
-                  <button type="button" onClick={handleSubmitAnswer}>{loading ? "Submitting" : "Submit"}</button>
+                  <button type="button" onClick={handleSubmitAnswer}>Submit</button>
                 </div>
               </div>
 
