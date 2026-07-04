@@ -10,6 +10,7 @@
     "post" : "/services/supabase/post",
     "retrieve_post" : "/services/supabase/retrieve_post",
     "answer" : "/services/supabase/answer",
-    "hearts" : "/services/supabase/hearts"
+    "hearts" : "/services/supabase/hearts",
+    "upvote" : "/services/supabase/upvote"
   }
 }

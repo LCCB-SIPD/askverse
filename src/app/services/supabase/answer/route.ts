@@ -3,14 +3,20 @@ import { supabaseServer } from "@/lib/supabase-server";
 
 export async function POST(params: NextRequest) {
   
-  const { answersList, id } = await params.json();
+  const { author, body, context, acc_address, id } = await params.json();
 
   try {
-    if (!id || answersList.length <= 0) return NextResponse.json({ success: false, error: "Data Provided not exist" }, { status: 404 });
+    if (!id) return NextResponse.json({ success: false, error: "Data Provided not exist" }, { status: 404 });
     const { error } = await supabaseServer
-    .from("feeds")
-    .update({ answersList })
-    .eq("id", id);
+    .from("answersList")
+    .insert({ 
+      body: body, 
+      gifts: 0, 
+      author: author, 
+      context: context, 
+      acc_address: acc_address,
+      questions_id: id
+    });
 
     if (error) {
       console.error(error);

@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import styles from "./css/styles.module.css";
 import { Fetch_to, formatTimeAgo } from "@/utilities";
 import json_route from "@/config/json_route/route.json";
-import { CordyStackTransStellar } from "@cordystackx/cordy_minikit";
+import { CordyStackTransStellar, useWalletStatus } from "@cordystackx/cordy_minikit";
 
 type FeedItem = {
   id: number;
@@ -23,8 +23,9 @@ type FeedItem = {
     acc_address: string;
     id: string;
     context: string;
+    questions_id: number;
   }>;
-  hearts_record: string[];
+  hearts_record: Array<string>;
 };
 
 type Content_feedProps = {
@@ -52,42 +53,50 @@ export default function Content_feed({ acc_address, displayName, context, filter
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
   const [replyDraft, setReplyDraft] = useState("");
-  const [giftTarget, setGiftTarget] = useState<{ questionId: number; acc_address: string, author: string, context: string } | null>(null);
+  const [giftTarget, setGiftTarget] = useState<{ questionId: string; acc_address: string, author: string, context: string } | null>(null);
   const [giftAmount, setGiftAmount] = useState<(typeof GIFT_AMOUNTS)[number]>(100);
   const [giftNote, setGiftNote] = useState("");
   const [loading, setLoading] = useState(false);
-  // const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const { refreshBalances } = useWalletStatus(); 
 
   useEffect(() => {
     async function Retrieve() {
       const response = await Fetch_to(json_route.feeds.retrieve_post);
 
+      const result = response.data.message;
+      
       if (response.success) {
+        const posts: FeedItem[] = result[0];
+        const answers: FeedItem["answersList"] = result[1];
+
+        const merged = posts.map((post: FeedItem) => {
+          const answersList = answers.filter(
+            (answer) => answer.questions_id === post.id
+          );
+
+          return {
+            ...post,
+            answers: answersList.length,
+            answersList,
+          };
+        });
+
         const myPosts = feedItems.filter(
           (item) => item.acc_address === acc_address
         );
 
-        
-        setFeedItems(filter ? myPosts : response.data.message);
+        setFeedItems(filter ? myPosts : merged);
+        setRefresh(false);
       }
     }
-
-
     Retrieve();
-  }, [filter]);
+  }, [refresh, filter]);
   
   const activeQuestion = useMemo(
     () => feedItems.find((item) => item.id === activeQuestionId) ?? null,
     [activeQuestionId, feedItems],
   );
-
-  useEffect(() => {
-    async function Answer() {
-      await Fetch_to(json_route.feeds.answer, { id: activeQuestion?.id, answersList: activeQuestion?.answersList });
-      setLoading(false);
-    }
-    Answer();
-  }, [activeQuestion?.answersList]);
 
 
   const handleOpenAnswers = (id: number) => {
@@ -104,8 +113,8 @@ export default function Content_feed({ acc_address, displayName, context, filter
 
   const handleSubmitAnswer = async() => {
     if (!activeQuestion || !replyDraft.trim()) return;
-    setLoading(true);
-    const randomUsername = `user${Math.floor(
+
+    const randomUsername = `${Math.floor(
       100000000 + Math.random() * 900000000
     )}`;
 
@@ -116,7 +125,8 @@ export default function Content_feed({ acc_address, displayName, context, filter
       gifts: 0,
       acc_address: acc_address,
       id: randomUsername,
-      context: context
+      context: context,
+      questions_id: 0
     };
 
     setFeedItems((current) =>
@@ -124,27 +134,29 @@ export default function Content_feed({ acc_address, displayName, context, filter
         item.id === activeQuestion.id
           ? {
               ...item,
-              answers: item.answers + 1,
+              answers: item?.answers + 1,
               answersList: [newAnswer, ...item.answersList],
             }
           : item,
       ),
     );
 
-    
     setReplyDraft("");
+
+    await Fetch_to(json_route.feeds.answer, { id: activeQuestion?.id, author: displayName, body: replyDraft, context: context, acc_address: acc_address });
 
   };
 
-  const handleOpenGift = (questionId: number, acc_address: string, author: string, context: string) => {
+  const handleOpenGift = (questionId: string, acc_address: string, author: string, context: string) => {
     setGiftTarget({ questionId, acc_address, author, context });
     setGiftAmount(100);
     setGiftNote("");
   };
 
   const handleSubmitGift = async() => {
-    if (!giftTarget) return;
-    
+    if (!giftTarget) return alert("Gift Target Not Exist");
+    setRefresh(true);
+
     if (context !== "Non-EVM") return alert("Invalid Wallet Please use Non-EVMs Wallets");
 
     if (giftTarget.context === "EVM") return alert("Invalid User Wallet, User not supported Non-EVMs Wallets");
@@ -153,27 +165,25 @@ export default function Content_feed({ acc_address, displayName, context, filter
     const response = await CordyStackTransStellar(giftTarget.acc_address, giftAmount, { memo: giftNote });
 
     if (response) {
-      alert("Send Gift Successfully to " + giftTarget.author);
-      setLoading(false);
+      
+
+      const response = await Fetch_to(json_route.feeds.upvote, {
+        id: giftTarget.questionId,
+        acc_address: giftTarget.acc_address,
+        upvote_add: giftAmount,
+        answersList: activeQuestion?.answersList
+      });
+
+      if (response.success) {
+        alert("Send Gift Successfully to " + giftTarget.author);
+        setRefresh(true);
+        refreshBalances();
+        setLoading(false);
+      }
     } else {
       alert("Something went wrong");
       setLoading(false);
     }
-
-    setFeedItems((current) =>
-      current.map((item) => {
-        if (item.id !== giftTarget.questionId) return item;
-
-        return {
-          ...item,
-          answersList: item.answersList.map((answer) =>
-            answer.author === giftTarget.acc_address
-              ? { ...answer, gifts: answer.gifts + 1 }
-              : answer,
-          ),
-        };
-      }),
-    );
 
     setGiftTarget(null);
     setGiftAmount(100);
@@ -204,7 +214,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
               <div className={styles.post_head}>
                 <div>
                   <strong>{item.acc_address === acc_address ? "Your Question" : item.author}</strong>
-                  <p style={{ marginTop: "1rem" }}>{item.question}</p>
+                  <p style={{ marginTop: "1rem", fontWeight: "bolder" }}> {item.question}</p>
                 </div>
                 <span>{formatTimeAgo(item.time)}</span>
               </div>
@@ -275,36 +285,34 @@ export default function Content_feed({ acc_address, displayName, context, filter
                 </div>
               </div>
 
-              {activeQuestion && activeQuestion.answersList?.length > 0 ? (
+              
+                {activeQuestion && activeQuestion.answersList?.length > 0 ? (
                 [...activeQuestion.answersList]
-                .sort(
-                  (a, b) =>
-                    new Date(b.time).getTime() - new Date(a.time).getTime()
-                ).map((answer) => (
-                  <article key={`${answer.id}-${answer.author}`} className={styles.answer_item}>
-                    <div className={styles.answer_item_head}>
-                      <strong>{answer.acc_address === acc_address ? "You" : answer.author + " " + answer.context + " Wallets"}</strong>
-                      <span>{formatTimeAgo(answer.time)}</span>
-                    </div>
-                    <p style={{ whiteSpace: "pre-line" }} >{answer.body}</p>
-                    {answer.acc_address !== acc_address && (
-                      <div className={styles.answer_item_footer}>
-                        <button
-                          type="button"
-                          className={styles.gift_button}
-                          onClick={() => handleOpenGift(activeQuestion.id, answer.acc_address, answer.author, answer.context)}
-                        >
-                          Gift XLM
-                        </button>
-                      </div>
-                    )}
-                  </article>
-                ))
-              ) : (
-                <h2 style={{ textAlign: "center" }}>No Answer Yet</h2>
-              )}
-            </div>
-
+                  .sort((a, b) => b.gifts - a.gifts).map((answer) => (
+                      <article key={`${answer.id}-${answer.author}`} className={styles.answer_item}>
+                        <div className={styles.answer_item_head}>
+                          <strong>{answer.acc_address === acc_address ? "You" : answer.author + " " + answer.context + " Wallets"}</strong>
+                          <span>{formatTimeAgo(answer.time)}</span>
+                        </div>
+                        <p style={{ whiteSpace: "pre-line" }} >{answer.body}</p>
+                        {answer.acc_address !== acc_address && (
+                          <div className={styles.answer_item_footer}>
+                            <p style={{ margin: "5px 20px" }} >Upvote Score: {answer.gifts} points</p>
+                            <button
+                              type="button"
+                              className={styles.gift_button}
+                              onClick={() => handleOpenGift(answer.id , answer.acc_address, answer.author, answer.context)}
+                            >
+                              Gift XLM
+                            </button>
+                          </div>
+                        )}
+                      </article>
+                    ))
+                  ) : (
+                    <h2 style={{ textAlign: "center" }}>No Answer Yet</h2>
+                  )}
+                </div>
             {giftTarget && (
               <div className={styles.gift_panel}>
                 <div className={styles.gift_panel_head}>

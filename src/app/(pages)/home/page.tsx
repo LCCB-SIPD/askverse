@@ -21,6 +21,7 @@ export default function Home_page() {
   const [bodyDraft, setBodyDraft] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
+  const [upvote, setUpvote] = useState("");
   const [globalLoading, setGlobalLaoding] = useState(false);
   const [filter, setFilter] = useState(false);
   const { context, evm, stellar } = useWalletStatus();
@@ -40,6 +41,7 @@ export default function Home_page() {
         const result = response.data.message[0];
         setDisplayName(result.author);
         setUsername(result.username);
+        setUpvote(result.over_all_upvote);
       } else {
         router.push("/");
       }
@@ -56,7 +58,7 @@ export default function Home_page() {
     <main className="homepage">
       <Header onPostQuestionClick={() => setQuestionComposerOpen((current) => !current)} />
       <div className="homepage_shell">
-        <Aside_left displayName={displayName} username={username} context={context} evm={`${evm.address}`} stellar={`${stellar.address}`} setDisplayName={setDisplayName} setUsername={setUsername} setFilter={setFilter} balance={context === "EVM" ? evm.balance : stellar.balance} />
+        <Aside_left upvote={upvote} displayName={displayName} username={username} context={context} evm={`${evm.address}`} stellar={`${stellar.address}`} setDisplayName={setDisplayName} setUsername={setUsername} setFilter={setFilter} balance={context === "EVM" ? evm.balance : stellar.balance} />
         <Content_feed displayName={displayName} context={context} acc_address={`${context === "EVM" ? evm.address : stellar.address}`} filter={filter} />
         <Aside_right />
         <Profile />

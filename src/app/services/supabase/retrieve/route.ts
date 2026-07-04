@@ -11,7 +11,7 @@ export async function POST(params: NextRequest) {
 
     const { data, error } = await supabaseServer
     .from("auth")
-    .select("author, username")
+    .select("author, username, over_all_upvote")
     .eq("acc_address", acc_address);
 
     if (error) {

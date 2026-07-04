@@ -14,7 +14,7 @@ export async function POST(params: NextRequest) {
 
     const { error } = await supabaseServer
     .from("feeds")
-    .insert([{ author, question, body, answersList: [], acc_address, time: new Date().toISOString(), hearts: 0, answers: 0 }]);
+    .insert([{ author, question, body, acc_address, time: new Date().toISOString(), hearts: 0, hearts_record: [] }]);
 
     if (error) {
       console.error(error);
