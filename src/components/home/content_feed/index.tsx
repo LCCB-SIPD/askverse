@@ -116,7 +116,6 @@ export default function Content_feed({ acc_address, displayName, context, filter
       if (!cancelled) {
         setFeedLoading(false);
       }
-      setRefresh(true);
     }
     Retrieve();
     return () => {
