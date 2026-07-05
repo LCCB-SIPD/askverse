@@ -26,7 +26,7 @@ export const getClientIp = (req: NextRequest): string => {
     return "unknown";
 };
 
-export const rateLimit = (req: NextRequest, options: RateLimitOptions) => {
+const rateLimit = (req: NextRequest, options: RateLimitOptions) => {
     const ip = getClientIp(req);
     const key = `${options.keyPrefix ?? "ip"}:${ip}`;
     const now = Date.now();
@@ -51,3 +51,5 @@ export const rateLimit = (req: NextRequest, options: RateLimitOptions) => {
         key
     };
 };
+
+export default rateLimit;

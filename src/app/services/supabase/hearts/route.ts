@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabase-server";
-import { rateLimit } from "@/lib/rate_limit";
+import { supabaseServer, rateLimit } from "@/lib";
 
 export async function POST(req: NextRequest) {
   const rate = rateLimit(req, {

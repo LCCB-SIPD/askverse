@@ -1,7 +1,6 @@
 "use server";
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabase-server";
-import { rateLimit } from "@/lib/rate_limit";
+import { supabaseServer, rateLimit } from "@/lib";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {

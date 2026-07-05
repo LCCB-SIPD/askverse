@@ -28,9 +28,11 @@ function getSupabaseServer() {
     return supabaseServerInstance;
 }
 
-export const supabaseServer = new Proxy({} as SupabaseClient, {
+const supabaseServer = new Proxy({} as SupabaseClient, {
     get(_target, prop) {
         const client = getSupabaseServer();
         return client[prop as keyof SupabaseClient];
     }
 });
+
+export default supabaseServer;
