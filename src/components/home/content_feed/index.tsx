@@ -49,11 +49,9 @@ function HeartIcon({ active }: { active?: boolean }) {
 }
 
 const GIFT_AMOUNTS = [100, 250, 500, 1000] as const;
-const PAGE_SIZE = 3;
 
 export default function Content_feed({ acc_address, displayName, context, filter, filterSearch } : Content_feedProps) {
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
-  const [debouncedSearch, setDebouncedSearch] = useState(filterSearch);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [feedLoading, setFeedLoading] = useState(false);
@@ -63,34 +61,27 @@ export default function Content_feed({ acc_address, displayName, context, filter
   const [giftAmount, setGiftAmount] = useState<(typeof GIFT_AMOUNTS)[number]>(100);
   const [giftNote, setGiftNote] = useState("");
   const [loading, setLoading] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refresh, setRefresh] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const { refreshBalances } = useWalletStatus(); 
-
-  useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(filterSearch), 300);
-    return () => clearTimeout(t);
-  }, [filterSearch]);
 
   useEffect(() => {
     setFeedItems([]);
     setPage(1);
     setHasMore(true);
-  }, [filter, debouncedSearch, acc_address]);
+  }, [filter, filterSearch, acc_address]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function Retrieve() {
-      if (feedLoading || !hasMore) return;
+      
       setFeedLoading(true);
 
       const response = await Fetch_to(json_route.feeds.retrieve_post, {
-        search: debouncedSearch,
-        acc_address,
-        filter,
+        search: filterSearch,
         page,
-        limit: PAGE_SIZE,
+        limit: 3,
       });
 
       if (response.success) {
@@ -98,16 +89,11 @@ export default function Content_feed({ acc_address, displayName, context, filter
         const posts: FeedItem[] = result[0];
         const answers: FeedItem["answersList"] = result[1];
 
-        // Build a lookup map for answers by question id to avoid O(n*m) filtering
-        const answersById: Record<number, FeedItem["answersList"]> = {};
-        for (const ans of answers) {
-          const qid = Number(ans.questions_id) || 0;
-          if (!answersById[qid]) answersById[qid] = [];
-          answersById[qid].push(ans);
-        }
-
         const merged = posts.map((post: FeedItem) => {
-          const answersList = answersById[post.id] || [];
+          const answersList = answers.filter(
+            (answer) => answer.questions_id === post.id
+          );
+
           return {
             ...post,
             answers: answersList.length,
@@ -115,21 +101,28 @@ export default function Content_feed({ acc_address, displayName, context, filter
           };
         });
 
+        const myPosts = merged.filter(
+          (item) => item.acc_address === acc_address
+        );
+
         if (!cancelled) {
-          setFeedItems((current) => (page === 1 ? merged : [...current, ...merged]));
-          setHasMore(merged.length === PAGE_SIZE);
+          const nextItems = filter ? myPosts : merged;
+          setFeedItems((current) => (page === 1 ? nextItems : [...current, ...nextItems]));
+          setHasMore(posts.length === 3);
         }
+        
       }
 
       if (!cancelled) {
         setFeedLoading(false);
       }
+      setRefresh(true);
     }
     Retrieve();
     return () => {
       cancelled = true;
     };
-  }, [filter, debouncedSearch, acc_address, page, refreshKey]);
+  }, [refresh, filter, filterSearch, acc_address, page]);
 
   useEffect(() => {
     const observerTarget = loadMoreRef.current;
@@ -211,6 +204,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
 
   const handleSubmitGift = async() => {
     if (!giftTarget) return alert("Gift Target Not Exist");
+    setRefresh(true);
 
     if (context !== "Non-EVM") return alert("Invalid Wallet Please use Non-EVMs Wallets");
 
@@ -231,10 +225,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
 
       if (response.success) {
         alert("Send Gift Successfully to " + giftTarget.author);
-        setRefreshKey((current) => current + 1);
-        setPage(1);
-        setHasMore(true);
-        setFeedItems([]);
+        setRefresh(true);
         refreshBalances();
         setLoading(false);
       }
@@ -263,10 +254,11 @@ export default function Content_feed({ acc_address, displayName, context, filter
       </div>
 
       <div className={styles.feed}>
-        {useMemo(() => {
-          return [...feedItems]
-            .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
-            .map((item) => (
+        {[...feedItems]
+          .sort(
+            (a, b) =>
+              new Date(b.time).getTime() - new Date(a.time).getTime()
+          ).map((item) => (
             <article className={styles.post} key={item.id}>
               <div className={styles.post_head}>
                 <div>
@@ -308,8 +300,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
                 </button>
               </div>
             </article>
-            ));
-          }, [feedItems])}
+        ))}
         <div ref={loadMoreRef} className={styles.feed_loader}>
           {feedLoading && <span>Loading more...</span>}
         </div>

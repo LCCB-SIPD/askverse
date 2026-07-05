@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib";
 
+type FeedRow = {
+  id: number;
+};
+
+type AnswerRow = {
+  questions_id: number;
+};
+
 
 export async function POST(request: Request) {
 
   try{
-    const { search = "", acc_address = "", filter = false, page = 1, limit = 3 } = await request.json().catch(() => ({}));
+    const { search = "", acc_address = "", filter = false, page = 1, limit = 5 } = await request.json().catch(() => ({}));
     const searchTerm = String(search)
     .replaceAll(",", " ")
     .replaceAll("(", " ")
@@ -23,7 +31,7 @@ export async function POST(request: Request) {
     .order("time", { ascending: false })
     .range(start, end);
 
-    if (searchTerm && searchTerm.length >= 3) {
+    if (searchTerm && searchTerm.length >= 5) {
       const pattern = `%${searchTerm.replaceAll("%", "\\%").replaceAll("_", "\\_")}%`;
 
       feedsQuery = feedsQuery.or(
@@ -37,14 +45,14 @@ export async function POST(request: Request) {
 
     const { data, error } = await feedsQuery;
 
-    const feeds = Array.isArray(data) ? data : [];
+    const feeds = Array.isArray(data) ? (data as FeedRow[]) : [];
 
     // Fetch answers only for the feeds returned on this page (avoid selecting whole table)
-    let answersList: any[] = [];
-    let Err_answersList: any = null;
+    let answersList: AnswerRow[] = [];
+    let Err_answersList: unknown = null;
 
     if (feeds.length > 0) {
-      const feedIds = feeds.map((f: any) => f.id).filter(Boolean);
+      const feedIds = feeds.map((feed) => feed.id).filter((id): id is number => Boolean(id));
       if (feedIds.length > 0) {
         const res = await supabaseServer
           .from("answersList")
