@@ -81,7 +81,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
       const response = await Fetch_to(json_route.feeds.retrieve_post, {
         search: filterSearch,
         page,
-        limit: 3,
+        limit: 5,
       });
 
       if (response.success) {
