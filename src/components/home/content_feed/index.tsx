@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import styles from "./css/styles.module.css";
 import { Fetch_to, formatTimeAgo } from "@/utilities";
 import json_route from "@/config/json_route/route.json";
@@ -35,6 +35,7 @@ type Content_feedProps = {
   filter: boolean;
   filterSearch: string;
   globalRefresh: boolean;
+  shared_link?: string;
 }
 
 function HeartIcon({ active }: { active?: boolean }) {
@@ -74,7 +75,7 @@ function FeedSkeleton() {
 
 const GIFT_AMOUNTS = [100, 250, 500, 1000] as const;
 
-export default function Content_feed({ acc_address, displayName, context, filter, filterSearch, globalRefresh } : Content_feedProps) {
+export default function Content_feed({ shared_link, acc_address, displayName, context, filter, filterSearch, globalRefresh } : Content_feedProps) {
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -86,6 +87,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
   const [giftNote, setGiftNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [copiedShareId, setCopiedShareId] = useState<number | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const { refreshBalances } = useWalletStatus(); 
 
@@ -93,7 +95,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
     setFeedItems([]);
     setPage(1);
     setHasMore(true);
-  }, [filter, filterSearch, acc_address]);
+  }, [filter, filterSearch, acc_address, shared_link]);
 
   useEffect(() => {
     let cancelled = false;
@@ -104,6 +106,9 @@ export default function Content_feed({ acc_address, displayName, context, filter
 
       const response = await Fetch_to(json_route.feeds.retrieve_post, {
         search: filterSearch,
+        acc_address,
+        filter,
+        shared_link,
         page,
         limit: 5,
       });
@@ -111,28 +116,10 @@ export default function Content_feed({ acc_address, displayName, context, filter
       if (response.success) {
         const result = response.data.message;
         const posts: FeedItem[] = result[0];
-        const answers: FeedItem["answersList"] = result[1];
-
-        const merged = posts.map((post: FeedItem) => {
-          const answersList = answers.filter(
-            (answer) => answer.questions_id === post.id
-          );
-
-          return {
-            ...post,
-            answers: answersList.length,
-            answersList,
-          };
-        });
-
-        const myPosts = merged.filter(
-          (item) => item.acc_address === acc_address
-        );
 
         if (!cancelled) {
-          const nextItems = filter ? myPosts : merged;
-          setFeedItems((current) => (page === 1 ? nextItems : [...current, ...nextItems]));
-          setHasMore(posts.length === 3);
+          setFeedItems((current) => (page === 1 ? posts : [...current, ...posts]));
+          setHasMore(posts.length === 5);
         }
         
       }
@@ -145,7 +132,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
     return () => {
       cancelled = true;
     };
-  }, [refresh, filter, filterSearch, acc_address, page, globalRefresh]);
+  }, [shared_link, refresh, filter, filterSearch, acc_address, page, globalRefresh]);
 
   useEffect(() => {
     const observerTarget = loadMoreRef.current;
@@ -169,6 +156,39 @@ export default function Content_feed({ acc_address, displayName, context, filter
     () => feedItems.find((item) => item.id === activeQuestionId) ?? null,
     [activeQuestionId, feedItems],
   );
+
+  const getShareUrl = useCallback((postId: number) => {
+    const baseUrl =
+      typeof window === "undefined"
+        ? "/home"
+        : `${window.location.origin}${window.location.pathname}`;
+    const shareUrl = new URL(baseUrl, typeof window === "undefined" ? "http://localhost" : window.location.origin);
+    shareUrl.searchParams.set("shared_linkpostid", String(postId));
+
+    return typeof window === "undefined" ? shareUrl.pathname + shareUrl.search : shareUrl.toString();
+  }, []);
+
+  const handleSharePost = async (item: FeedItem) => {
+    const url = getShareUrl(item.id);
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: item.question,
+          text: item.body,
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopiedShareId(item.id);
+        window.setTimeout(() => setCopiedShareId(null), 1800);
+      }
+    } catch (error) {
+      if ((error as DOMException).name !== "AbortError") {
+        alert("Unable to share this post right now.");
+      }
+    }
+  };
 
 
   const handleOpenAnswers = (id: number) => {
@@ -282,11 +302,7 @@ export default function Content_feed({ acc_address, displayName, context, filter
             <FeedSkeleton key={index} />
           ))
         ) : (
-          [...feedItems]
-          .sort(
-            (a, b) =>
-              new Date(b.time).getTime() - new Date(a.time).getTime()
-          ).map((item) => (
+          feedItems.map((item) => (
             <article className={styles.post} key={item.id}>
               
               <div className={styles.post_head}>
@@ -303,6 +319,9 @@ export default function Content_feed({ acc_address, displayName, context, filter
               <div className={styles.post_footer}>
                 <button type="button" onClick={() => handleOpenAnswers(item.id)}>
                   Show Answers
+                </button>
+                <button type="button" onClick={() => handleSharePost(item)}>
+                  {copiedShareId === item.id ? "Link Copied" : "Share"}
                 </button>
                 <button onClick={async() => {
                   setFeedItems((prev) =>

@@ -5,19 +5,11 @@ import styles from "./css/styles.module.css";
 import { Fetch_to } from "@/utilities";
 import json_route from "@/config/json_route/route.json";
 
-type AnswerItem = {
-  author: string;
-  gifts: number;
-  acc_address: string;
-  context: string;
-};
-
 type RankedUser = {
   author: string;
+  username: string;
   upVotes: number;
   acc_address: string;
-  context: string;
-  answers: number;
 };
 
 function shortWallet(address: string) {
@@ -36,40 +28,26 @@ export default function Leader_boards() {
     async function retrieveLeaders() {
       setLoading(true);
 
-      const response = await Fetch_to(json_route.feeds.retrieve_post, {
-        search: "",
-        page: 1,
-        limit: 100,
+      const response = await Fetch_to(json_route.info.retrieve, {
+        leaderboard: true,
+        limit: 10,
       });
 
       if (cancelled) return;
 
       if (response.success) {
-        const answers: AnswerItem[] = response.data.message?.[1] ?? [];
-        const leaders = answers.reduce<Record<string, RankedUser>>((record, answer) => {
-          const key = answer.acc_address || answer.author;
-          const current = record[key] ?? {
-            author: answer.author || "Anonymous",
-            upVotes: 0,
-            acc_address: answer.acc_address,
-            context: answer.context,
-            answers: 0,
-          };
-
-          record[key] = {
-            ...current,
-            author: answer.author || current.author,
-            upVotes: current.upVotes + Number(answer.gifts || 0),
-            answers: current.answers + 1,
-          };
-
-          return record;
-        }, {});
-
         setRankedUsers(
-          Object.values(leaders)
-            .sort((a, b) => b.upVotes - a.upVotes)
-            .slice(0, 10),
+          (response.data.message ?? []).map((user: {
+            author?: string;
+            username?: string;
+            over_all_upvote?: number;
+            acc_address?: string;
+          }) => ({
+            author: user.author || "Anonymous",
+            username: user.username || "No username",
+            upVotes: Number(user.over_all_upvote || 0),
+            acc_address: user.acc_address || "",
+          })),
         );
       }
 
@@ -92,7 +70,7 @@ export default function Leader_boards() {
           <div>
             <span className={styles.kicker}>Leader Boards</span>
             <h1>Top up-voted creators</h1>
-            <p>Users ranked by the total up-vote score gifted to their answers.</p>
+            <p>Users ranked by their saved total up-vote score.</p>
           </div>
 
           <div className={styles.top_card}>
@@ -121,7 +99,7 @@ export default function Leader_boards() {
             <span>Rank</span>
             <span>User</span>
             <span>Wallet</span>
-            <span>Answers</span>
+            <span>Username</span>
             <span>Up Votes</span>
           </div>
 
@@ -143,18 +121,18 @@ export default function Leader_boards() {
                   <span className={styles.small_avatar}>{user.author.slice(0, 1).toUpperCase()}</span>
                   <div>
                     <strong>{user.author}</strong>
-                    <p>{user.context || "Wallet"} user</p>
+                    <p>{user.username}</p>
                   </div>
                 </div>
                 <span>{shortWallet(user.acc_address)}</span>
-                <span>{user.answers}</span>
+                <span>{user.username}</span>
                 <strong>{user.upVotes.toLocaleString()}</strong>
               </article>
             ))
           ) : (
             <div className={styles.empty}>
               <strong>No ranked users yet</strong>
-              <p>When answers receive up-vote gifts, the top users will show here.</p>
+              <p>When users receive up-vote gifts, the top users will show here.</p>
             </div>
           )}
         </div>

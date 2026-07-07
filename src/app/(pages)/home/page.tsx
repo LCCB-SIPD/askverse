@@ -12,11 +12,13 @@ import { useEffect } from "react";
 import { Fetch_to } from "@/utilities";
 import json_route from "@/config/json_route/route.json";
 import { useWalletStatus, useDisconnectWallets } from "@cordystackx/cordy_minikit";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Home_page() {
   const router = useRouter();
   const [questionComposerOpen, setQuestionComposerOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const shared_link = searchParams.get('shared_linkpostid');
   const [questionDraft, setQuestionDraft] = useState("");
   const [bodyDraft, setBodyDraft] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -61,7 +63,7 @@ export default function Home_page() {
       <Header setFilterSearch={setFilterSearch} filterSearch={filterSearch} onPostQuestionClick={() => setQuestionComposerOpen((current) => !current)} />
       <div className="homepage_shell">
         <Aside_left upvote={upvote} displayName={displayName} username={username} context={context} evm={`${evm.address}`} stellar={`${stellar.address}`} setDisplayName={setDisplayName} setUsername={setUsername} setFilter={setFilter} balance={context === "EVM" ? evm.balance : stellar.balance} />
-        <Content_feed globalRefresh={globalRefresh} filterSearch={filterSearch} displayName={displayName} context={context} acc_address={`${context === "EVM" ? evm.address : stellar.address}`} filter={filter} />
+        <Content_feed shared_link={`${shared_link}`} globalRefresh={globalRefresh} filterSearch={filterSearch} displayName={displayName} context={context} acc_address={`${context === "EVM" ? evm.address : stellar.address}`} filter={filter} />
         <Aside_right setFilterSearch={setFilterSearch} />
         <Profile />
       </div>
