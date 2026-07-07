@@ -14,7 +14,7 @@ https://github.com/LCCB-SIPD/askverse.git
 https://askverse-pi.vercel.app/
 
 **Video Demo Link:**  
-Add video demo link here.
+[![AskVerse video demo](https://drive.google.com/thumbnail?id=10wXNliNkMXPn7wIUB3l65hrJZ7KT7n47)](https://drive.google.com/file/d/1NMawIzTk_0krOAeY8xzMi5ykWmgvEO3d/view?usp=sharing)
 
 **Presentation (PPT) Link:**  
 https://canva.link/qnrbb2f8ll3fq7l
