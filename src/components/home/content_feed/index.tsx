@@ -98,7 +98,6 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
   }, [filter, filterSearch, acc_address, shared_link]);
 
   useEffect(() => {
-    let cancelled = false;
 
     async function Retrieve() {
       
@@ -117,21 +116,16 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
         const result = response.data.message;
         const posts: FeedItem[] = result[0];
 
-        if (!cancelled) {
-          setFeedItems((current) => (page === 1 ? posts : [...current, ...posts]));
-          setHasMore(posts.length === 5);
-        }
+        
+        setFeedItems((current) => (page === 1 ? posts : [...current, ...posts]));
+        setHasMore(posts.length === 5);
+
         
       }
 
-      if (!cancelled) {
-        setFeedLoading(false);
-      }
+      setFeedLoading(false);
     }
     Retrieve();
-    return () => {
-      cancelled = true;
-    };
   }, [shared_link, refresh, filter, filterSearch, acc_address, page, globalRefresh]);
 
   useEffect(() => {
