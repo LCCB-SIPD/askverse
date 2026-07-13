@@ -1,41 +1,85 @@
 # AskVerse
 
-AskVerse is a wallet-connected Q&A app where users can ask questions, share answers, heart useful posts, and send XLM gifts to helpful answer creators. The app also includes a leaderboard that ranks users by the up-vote score they earn from gifted answers.
+**Wallet-connected Q&A platform where good answers get gifted, not just liked.**
 
-## Hackathon Submission
+AskVerse lets communities ask questions, share answers, and reward the most helpful responses with real XLM — turning knowledge-sharing into something tangible. Built for the APAC Stellar Hackathon under the **Payment & Consumer Applications** track.
 
-**Project Description:**  
-AskVerse is a wallet-connected Q&A platform that helps communities reward useful knowledge. Users can ask questions, answer posts, heart helpful content, send XLM gifts to valuable answers, and compete on a leaderboard based on gifted answer score.
+[Live Demo](https://askverse-pi.vercel.app/) · [Video Demo](https://drive.google.com/file/d/1NMawIzTk_0krOAeY8xzMi5ykWmgvEO3d/view?usp=sharing) · [Pitch Deck](https://canva.link/qnrbb2f8ll3fq7l)
 
-**GitHub Repository Link:**  
-https://github.com/LCCB-SIPD/askverse.git
+---
 
-**Live Demo:**  
-https://askverse-pi.vercel.app/
+## Focus Area: Payment & Consumer Applications
 
-**Video Demo Link:**  
-[![AskVerse video demo](https://drive.google.com/thumbnail?id=10wXNliNkMXPn7wIUB3l65hrJZ7KT7n47)](https://drive.google.com/file/d/1NMawIzTk_0krOAeY8xzMi5ykWmgvEO3d/view?usp=sharing)
+AskVerse is a consumer-facing payment tool disguised as a Q&A app. The core loop — ask, answer, gift, rank — turns Stellar's fast, low-fee rails into an everyday reward mechanism anyone can use without needing to understand blockchain first. A user connects a wallet, browses questions like they would on any forum, and can tip a helpful answer in XLM in a couple of taps. That's the accessible, real-world payment experience this track calls for.
 
-**Presentation (PPT) Link:**  
-https://canva.link/qnrbb2f8ll3fq7l
+## The Problem
+
+Good answers online routinely go unrewarded. Upvotes and hearts feel good but carry no real value, so there's little incentive for people to share deep, useful knowledge — especially in communities (students, local business owners, hobbyists) where expertise is often given away for free. AskVerse closes that gap by letting anyone reward useful answers with a real XLM gift, instantly and without a payment processor in between.
+
+## How It Works
+
+1. **Ask** — post a question with a title and detailed body.
+2. **Answer** — community members respond.
+3. **Heart** — react to posts you find useful.
+4. **Gift** — send XLM directly to an answer that helped you.
+5. **Rank** — the leaderboard tracks total gifted score, surfacing the most valuable contributors.
+
+Rewards aren't auto-minted — they're peer-funded. The leaderboard reflects real value transferred, not just popularity.
+
+## Screenshots
+
+> _Add testnet transaction / deployment screenshot(s) here before submission — required per hackathon rules._
+>
+> ```md
+> ![Testnet transaction proof](./docs/screenshots/testnet-tx.png)
+> ![App feed](./docs/screenshots/feed.png)
+> ![Gift flow](./docs/screenshots/gift-flow.png)
+> ```
+
+## Tech Stack
+
+| Layer | Tech |
+|---|---|
+| Framework | Next.js 16, React 19, TypeScript |
+| Styling | CSS Modules |
+| Data | Supabase |
+| State/Data-fetching | TanStack Query |
+| Wallet / Chain Abstraction | [Cordy Minikit](https://www.npmjs.com/package/@cordystackx/cordy_minikit) (CordyStackX) |
+| Stellar | Testnet, Horizon API |
+| EVM | Base Sepolia |
+
+## Architecture
+
+```
+┌─────────────┐      ┌──────────────────┐      ┌─────────────────┐
+│   Next.js   │─────▶│  Cordy Minikit   │─────▶│ Stellar Horizon │
+│   Frontend  │      │  (wallet layer)  │      │  (Testnet)      │
+└──────┬──────┘      └──────────────────┘      └─────────────────┘
+       │
+       ▼
+┌─────────────┐
+│  Supabase   │  ← questions, answers, hearts, gifts, profiles, leaderboard
+└─────────────┘
+```
+
+Cordy Minikit handles wallet connection and Stellar payment calls to Horizon; Supabase stores app state (posts, gift records, leaderboard scores) and keeps score reconciliation off-chain for speed, while the actual value transfer happens on-chain via XLM.
 
 ## Contract Addresses
 
-### EVM - Base Sepolia
+### Stellar / Soroban Testnet
+
+```env
+NEXT_PUBLIC_STELLAR_HORIZON=https://horizon-testnet.stellar.org
+NEXT_PUBLIC_STELLAR_CONTRACT_ID=CBHL6LZVEVKGNEGDX6VZ2PP2VIQZOU3QRYLNZHJBRBMLWHBYW5UINFDJ
+NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
+```
+
+### EVM — Base Sepolia
 
 ```env
 NEXT_PUBLIC_RPC_ENDPOINT=https://sepolia.base.org
 NEXT_PUBLIC_TOKENADDRESS=0x7E0A673a70eC87C0a16370929280da2483703e62
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=67d2d578d855e579911095f9db6d4b29
-```
-
-### Stellar / Soroban Testnet
-
-```env
-# Stellar / Soroban Non-EVM
-NEXT_PUBLIC_STELLAR_HORIZON=https://horizon-testnet.stellar.org
-NEXT_PUBLIC_STELLAR_CONTRACT_ID=CBHL6LZVEVKGNEGDX6VZ2PP2VIQZOU3QRYLNZHJBRBMLWHBYW5UINFDJ
-NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
 ```
 
 ## Features
@@ -48,48 +92,50 @@ NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
 - Track profile balance and total up-vote score
 - Edit display name and username
 - View leaderboards for top answer creators
-- Connect EVM and Non-EVM wallets through Cordy Minikit
-
-## Tech Stack
-
-- Next.js 16
-- React 19
-- TypeScript
-- CSS Modules
-- Supabase
-- TanStack Query
-- CordyStack Cordy Minikit
-- Stellar testnet support
-- Base Sepolia EVM support
+- Connect EVM and non-EVM wallets through Cordy Minikit
 
 ## App Routes
 
-- `/` - landing page
-- `/auth/sign-in` - wallet sign-in
-- `/home` - main Q&A feed
-- `/leader_boards` - top users by gifted answer score
+| Route | Description |
+|---|---|
+| `/` | Landing page |
+| `/auth/sign-in` | Wallet sign-in |
+| `/home` | Main Q&A feed |
+| `/leader_boards` | Top users by gifted answer score |
 
 ## API Routes
 
-- `/services/supabase/auth` - create or authenticate user profile
-- `/services/supabase/retrieve` - retrieve user profile
-- `/services/supabase/update` - update profile
-- `/services/supabase/post` - create a question
-- `/services/supabase/retrieve_post` - retrieve questions and answers
-- `/services/supabase/answer` - submit an answer
-- `/services/supabase/hearts` - toggle post hearts
-- `/services/supabase/upvote` - record gifted answer score
-- `/services/supabase/health` - health check
+| Route | Purpose |
+|---|---|
+| `/services/supabase/auth` | Create or authenticate user profile |
+| `/services/supabase/retrieve` | Retrieve user profile |
+| `/services/supabase/update` | Update profile |
+| `/services/supabase/post` | Create a question |
+| `/services/supabase/retrieve_post` | Retrieve questions and answers |
+| `/services/supabase/answer` | Submit an answer |
+| `/services/supabase/hearts` | Toggle post hearts |
+| `/services/supabase/upvote` | Record gifted answer score |
+| `/services/supabase/health` | Health check |
 
 ## Getting Started
 
-Install dependencies:
+### Prerequisites
+- Node.js 18+
+- npm (or pnpm)
+- A Supabase project
+- A Stellar testnet-funded wallet (for testing gifts)
+
+### Installation
 
 ```bash
+git clone https://github.com/LCCB-SIPD/askverse.git
+cd askverse
 npm install
 ```
 
-Create `.env.local` and add your own project values:
+### Environment Setup
+
+Create `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
@@ -110,53 +156,47 @@ NEXT_PUBLIC_STELLAR_CONTRACT_ID=
 NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE=
 ```
 
-Run the development server:
+### Run Locally
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Scripts
+### Scripts
 
 ```bash
-npm run dev
-npm run lint
-npm run build
-npm run start
+npm run dev      # start dev server
+npm run lint      # lint codebase
+npm run build     # production build
+npm run start     # run production build
 ```
 
-## How Rewards Work
+## Roadmap
 
-AskVerse does not automatically mint rewards. Users can send XLM gifts to answers they find helpful. Those gifts are recorded as up-vote score, and the leaderboard ranks users by the total score earned from their answers.
-
-## Live Demo
-
-https://askverse-pi.vercel.app/
-
-## Repository
-
-https://github.com/LCCB-SIPD/askverse.git
+- [ ] Mainnet deployment on Stellar
+- [ ] Soroban smart contract integration for on-chain gift/score verification (`askverse_gifts` contract in progress)
+- [ ] Notifications for gifted answers
+- [ ] Mobile-responsive polish
+- [ ] Expanded moderation tools for community feeds
 
 ## Team
 
-**Marc Giestin Louis Cordova (CordyStackX)**  
-Founder and Lead Developer
+**Marc Giestin Louis Cordova** ([CordyStackX](https://github.com/CordyStackX)) — Founder & Lead Developer
+Designed and developed the platform; built the frontend and backend routes; integrated wallet connection; implemented question, answer, gift, profile, and leaderboard flows.
 
-- Designed and developed the platform
-- Built the frontend and backend routes
-- Integrated wallet connection
-- Implemented question, answer, gift, profile, and leaderboard flows
+**Gilbert Lerion** — Developer
 
-**Gilbert Lerion** - Developer
+**Julian Martir** & **Angel Lucenio** — Documentation & Presentation
+Prepared project documentation, created the pitch deck, presented the project during the hackathon.
 
-**Julian Martir** and **Angel Lucenio**  
-Documentation and Presentation
+## Links
 
-- Prepared project documentation
-- Created the pitch deck
-- Presented the project during the hackathon
+- **Repository:** https://github.com/LCCB-SIPD/askverse.git
+- **Live Demo:** https://askverse-pi.vercel.app/
+- **Video Demo:** https://drive.google.com/file/d/1NMawIzTk_0krOAeY8xzMi5ykWmgvEO3d/view?usp=sharing
+- **Pitch Deck:** https://canva.link/qnrbb2f8ll3fq7l
 
 ## License
 
