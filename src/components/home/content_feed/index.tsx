@@ -83,7 +83,7 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
   const [replyDraft, setReplyDraft] = useState("");
   const [giftTarget, setGiftTarget] = useState<{ questionId: string; acc_address: string, author: string, context: string } | null>(null);
-  const [giftAmount, setGiftAmount] = useState<(typeof GIFT_AMOUNTS)[number]>(20);
+  const [giftAmount, setGiftAmount] = useState<(typeof GIFT_AMOUNTS)[number]>(5);
   const [giftNote, setGiftNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
@@ -193,7 +193,7 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
     setActiveQuestionId(null);
     setReplyDraft("");
     setGiftTarget(null);
-    setGiftAmount(20);
+    setGiftAmount(5);
     setGiftNote("");
   };
 
@@ -235,7 +235,7 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
 
   const handleOpenGift = (questionId: string, acc_address: string, author: string, context: string) => {
     setGiftTarget({ questionId, acc_address, author, context });
-    setGiftAmount(20);
+    setGiftAmount(5);
     setGiftNote("");
   };
 
@@ -272,7 +272,7 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
     }
 
     setGiftTarget(null);
-    setGiftAmount(20);
+    setGiftAmount(5);
     setGiftNote("");
   };
 
