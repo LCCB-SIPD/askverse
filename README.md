@@ -26,16 +26,6 @@ Good answers online routinely go unrewarded. Upvotes and hearts feel good but ca
 
 Rewards aren't auto-minted — they're peer-funded. The leaderboard reflects real value transferred, not just popularity.
 
-## Screenshots
-
-> _Add testnet transaction / deployment screenshot(s) here before submission — required per hackathon rules._
->
-> ```md
-> ![Testnet transaction proof](./docs/screenshots/testnet-tx.png)
-> ![App feed](./docs/screenshots/feed.png)
-> ![Gift flow](./docs/screenshots/gift-flow.png)
-> ```
-
 ## Tech Stack
 
 | Layer | Tech |
@@ -50,16 +40,11 @@ Rewards aren't auto-minted — they're peer-funded. The leaderboard reflects rea
 
 ## Architecture
 
-```
-┌─────────────┐      ┌──────────────────┐      ┌─────────────────┐
-│   Next.js   │─────▶│  Cordy Minikit   │─────▶│ Stellar Horizon │
-│   Frontend  │      │  (wallet layer)  │      │  (Testnet)      │
-└──────┬──────┘      └──────────────────┘      └─────────────────┘
-       │
-       ▼
-┌─────────────┐
-│  Supabase   │  ← questions, answers, hearts, gifts, profiles, leaderboard
-└─────────────┘
+```mermaid
+flowchart LR
+    A["Next.js Frontend<br/>(React 19, TypeScript)"] -->|wallet calls| B["Cordy Minikit<br/>(wallet layer)"]
+    B -->|payment tx| C["Stellar Horizon<br/>(Testnet)"]
+    A -->|CRUD| D["Supabase<br/>questions · answers · hearts<br/>gifts · profiles · leaderboard"]
 ```
 
 Cordy Minikit handles wallet connection and Stellar payment calls to Horizon; Supabase stores app state (posts, gift records, leaderboard scores) and keeps score reconciliation off-chain for speed, while the actual value transfer happens on-chain via XLM.
@@ -197,7 +182,45 @@ Prepared project documentation, created the pitch deck, presented the project du
 - **Live Demo:** https://askverse-pi.vercel.app/
 - **Video Demo:** https://drive.google.com/file/d/1NMawIzTk_0krOAeY8xzMi5ykWmgvEO3d/view?usp=sharing
 - **Pitch Deck:** https://canva.link/qnrbb2f8ll3fq7l
+- **Github:** https://github.com/cordystackx
+- **XTwitter:** https://x.com/cordystackx
+- **LinkedIn:** www.linkedin.com/in/marc-giestin-louis-cordova-657849276
+- **Telegram:** https://t.me/cordystackx
 
 ## License
 
 MIT
+
+---
+
+## Screenshots
+
+### Landing & Auth
+
+| Landing Page | Login |
+|---|---|
+| ![Landing Page](public/ScreenShot/landpage.png) | ![Login Page](public/ScreenShot/LoginPage.png) |
+
+| Connect Wallet | Connect Wallet (Step 2) |
+|---|---|
+| ![Connect Wallet](public/ScreenShot/ConnectWallet.png) | ![Connect Wallet 2](public/ScreenShot/ConnectWallet2.png) |
+
+### Core App
+
+| Home Feed | Post a Question |
+|---|---|
+| ![Home Page](public/ScreenShot/HomePage.png) | ![Post Questions](public/ScreenShot/Post_Questions.png) |
+
+| Submit an Answer | Leaderboard |
+|---|---|
+| ![Submit Answers](public/ScreenShot/Submit_Answers.png) | ![Leaderboards](public/ScreenShot/LeaderBoeards.png) |
+
+### Gifting
+
+| Gift Flow | Gift Flow (Step 2) |
+|---|---|
+| ![Gifts](public/ScreenShot/Gfits.png) | ![Gifts 2](public/ScreenShot/Gifts2.png) |
+
+### Account
+
+![Account Info & Logout](public/ScreenShot/Account_info_logout.png)
