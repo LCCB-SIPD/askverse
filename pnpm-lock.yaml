@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@cordystackx/cordy_minikit':
-        specifier: ^2.0.10
-        version: 2.0.10(@safe-global/safe-apps-provider@0.18.6(typescript@5.9.3)(zod@3.25.76))(@safe-global/safe-apps-sdk@9.1.0(typescript@5.9.3)(zod@3.25.76))(@tanstack/query-core@5.101.2)(@types/react@19.2.17)(next@16.2.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.101.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.4.0(react@19.1.0))(zod@3.25.76)
+        specifier: ^2.0.11
+        version: 2.0.11(@safe-global/safe-apps-provider@0.18.6(typescript@5.9.3)(zod@3.25.76))(@safe-global/safe-apps-sdk@9.1.0(typescript@5.9.3)(zod@3.25.76))(@tanstack/query-core@5.101.2)(@types/react@19.2.17)(next@16.2.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.101.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.4.0(react@19.1.0))(zod@3.25.76)
       '@supabase/supabase-js':
         specifier: ^2.110.5
         version: 2.110.5
@@ -109,8 +109,8 @@ packages:
   '@coinbase/wallet-sdk@4.3.7':
     resolution: {integrity: sha512-z6e5XDw6EF06RqkeyEa+qD0dZ2ZbLci99vx3zwDY//XO8X7166tqKJrR2XlQnzVmtcUuJtCd5fCvr9Cu6zzX7w==}
 
-  '@cordystackx/cordy_minikit@2.0.10':
-    resolution: {integrity: sha512-dCfPCgUHC6+O6Tba+lwywVpxBaOe2SdphEtIDgwdyTyzAZ2eItMg0XqN6PSYqSJLMIWqPKGVt5yYEZnJA2LUeg==}
+  '@cordystackx/cordy_minikit@2.0.11':
+    resolution: {integrity: sha512-isxdhGlZRgLsGjDQx0h06W48AUYNacQTD9698G/ML/lyGd3J+IKZlzhiSUN3C600ZY0oFxLGVt5KNEpbiVm3bA==}
     peerDependencies:
       next: '>=13'
       react: '>=18'
@@ -3463,14 +3463,6 @@ packages:
       react:
         optional: true
 
-  viem@2.55.1:
-    resolution: {integrity: sha512-sajvEmONS3dEDFh0jKXGugTU8ImyGoIV3sEHSWNRhgkH484v/+6DjZAplRhcdeqNV/VBxOs/l3raOG4NaXvX9A==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   viem@2.55.2:
     resolution: {integrity: sha512-XlJeyNAZ96dQfOHlxLTK1FKgtWw/TtxENKNMBSBgxqALjiWiBWrFmSSzwwMivryKnBwkbt5E+90jSCLnVEilLA==}
     peerDependencies:
@@ -3675,7 +3667,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@cordystackx/cordy_minikit@2.0.10(@safe-global/safe-apps-provider@0.18.6(typescript@5.9.3)(zod@3.25.76))(@safe-global/safe-apps-sdk@9.1.0(typescript@5.9.3)(zod@3.25.76))(@tanstack/query-core@5.101.2)(@types/react@19.2.17)(next@16.2.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.101.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.4.0(react@19.1.0))(zod@3.25.76)':
+  '@cordystackx/cordy_minikit@2.0.11(@safe-global/safe-apps-provider@0.18.6(typescript@5.9.3)(zod@3.25.76))(@safe-global/safe-apps-sdk@9.1.0(typescript@5.9.3)(zod@3.25.76))(@tanstack/query-core@5.101.2)(@types/react@19.2.17)(next@16.2.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.101.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.4.0(react@19.1.0))(zod@3.25.76)':
     dependencies:
       '@coinbase/wallet-sdk': 4.3.7(typescript@5.9.3)(zod@3.25.76)
       '@metamask/connect-evm': 2.1.1
@@ -4552,7 +4544,7 @@ snapshots:
   '@safe-global/safe-apps-sdk@9.1.0(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@safe-global/safe-gateway-typescript-sdk': 3.23.1
-      viem: 2.55.1(typescript@5.9.3)(zod@3.25.76)
+      viem: 2.55.2(typescript@5.9.3)(zod@3.25.76)
     transitivePeerDependencies:
       - bufferutil
       - typescript
@@ -8011,24 +8003,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.17
       react: 19.1.0
-
-  viem@2.55.1(typescript@5.9.3)(zod@3.25.76):
-    dependencies:
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)(zod@3.25.76)
-      isows: 1.0.7(ws@8.21.0)
-      ox: 0.14.30(typescript@5.9.3)(zod@3.25.76)
-      ws: 8.21.0
-    optionalDependencies:
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-      - zod
-    optional: true
 
   viem@2.55.2(typescript@5.9.3)(zod@3.22.4):
     dependencies:
