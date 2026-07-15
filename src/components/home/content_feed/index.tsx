@@ -1,7 +1,6 @@
 "use client";
-
 import { useCallback, useMemo, useState, useEffect, useRef } from "react";
-import styles from "./css/styles.module.css";
+import styles from "./css/styles.module.scss";
 import { Fetch_to, formatTimeAgo } from "@/utilities";
 import json_route from "@/config/json_route/route.json";
 import { CordyStackTransStellar, useWalletStatus } from "@cordystackx/cordy_minikit";
@@ -24,6 +23,13 @@ type FeedItem = {
     id: string;
     context: string;
     questions_id: number;
+      replies?: Array<{
+      author: string;
+      body: string;
+      time: string;
+      acc_address: string;
+      id: string;
+    }>;
   }>;
   hearts_record: Array<string>;
 };
@@ -87,6 +93,12 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
   const [giftNote, setGiftNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [replyingToAnswerId, setReplyingToAnswerId] = useState<string | null>(null);
+  const [answerReplyDraft, setAnswerReplyDraft] = useState("");
+  const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionAnswerId, setMentionAnswerId] = useState<string | null>(null);
+  const replyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [copiedShareId, setCopiedShareId] = useState<number | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const { refreshBalances } = useWalletStatus(); 
@@ -145,6 +157,49 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
     observer.observe(observerTarget);
     return () => observer.disconnect();
   }, [hasMore, feedLoading]);
+
+  useEffect(() => {
+    if (!activeQuestion || !activeQuestion.answersList?.length) return;
+
+    async function fetchReplies() {
+      const answerIds = activeQuestion?.answersList.map((a) => a.id);
+
+      const response = await Fetch_to(json_route.feeds.retrieve_reply, { answer_ids: answerIds });
+
+      if (response.success) {
+        const grouped = response.data.message as Record<string, Array<{
+          id: number;
+          answer_id: number;
+          author: string;
+          body: string;
+          acc_address: string;
+          created_at: string;
+        }>>;
+
+        setFeedItems((current) =>
+          current.map((item) =>
+            item.id === activeQuestion?.id
+              ? {
+                  ...item,
+                  answersList: item.answersList.map((answer) => ({
+                    ...answer,
+                    replies: (grouped[answer.id] ?? []).map((r) => ({
+                      author: r.author,
+                      body: r.body,
+                      time: r.created_at,
+                      acc_address: r.acc_address,
+                      id: String(r.id),
+                    })),
+                  })),
+                }
+              : item,
+          ),
+        );
+      }
+    }
+
+    fetchReplies();
+  }, [activeQuestionId]);
   
   const activeQuestion = useMemo(
     () => feedItems.find((item) => item.id === activeQuestionId) ?? null,
@@ -195,6 +250,8 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
     setGiftTarget(null);
     setGiftAmount(5);
     setGiftNote("");
+    setReplyingToAnswerId(null);
+    setAnswerReplyDraft("");
   };
 
   const handleSubmitAnswer = async() => {
@@ -232,6 +289,76 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
     await Fetch_to(json_route.feeds.answer, { id: activeQuestion?.id, author: displayName, body: replyDraft, context: context, acc_address: acc_address });
 
   };
+
+  const handleOpenReplyToAnswer = (answerId: string) => {
+    setReplyingToAnswerId(answerId);
+    setAnswerReplyDraft("");
+  };
+
+  const handleCancelReplyToAnswer = () => {
+    setReplyingToAnswerId(null);
+    setAnswerReplyDraft("");
+  };
+
+  const handleSubmitReplyToAnswer = async (answerId: string) => {
+    if (!activeQuestion || !answerReplyDraft.trim()) return;
+
+    const randomId = `${Math.floor(100000000 + Math.random() * 900000000)}`;
+
+    const newReply = {
+      author: displayName,
+      body: answerReplyDraft.trim(),
+      time: new Date().toISOString(),
+      acc_address: acc_address,
+      id: randomId,
+    };
+
+    setFeedItems((current) =>
+      current.map((item) =>
+        item.id === activeQuestion.id
+          ? {
+              ...item,
+              answersList: item.answersList.map((answer) =>
+                answer.id === answerId
+                  ? { ...answer, replies: [...(answer.replies ?? []), newReply] }
+                  : answer,
+              ),
+            }
+          : item,
+      ),
+    );
+
+    setReplyingToAnswerId(null);
+    setAnswerReplyDraft("");
+
+    await Fetch_to(json_route.feeds.reply, {
+      answer_id: answerId,
+      author: displayName,
+      body: newReply.body,
+      acc_address: acc_address,
+    });
+  };
+
+  const toggleRepliesExpanded = (answerId: string) => {
+    setExpandedReplies((current) => ({
+      ...current,
+      [answerId]: !current[answerId],
+    }));
+  };
+
+  function renderWithMentions(text: string) {
+    const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
+
+    return parts.map((part, index) =>
+      part.startsWith("@") ? (
+        <span key={index} className={styles.mention}>
+          {part}
+        </span>
+      ) : (
+        <span key={index}>{part}</span>
+      ),
+    );
+  }
 
   const handleOpenGift = (questionId: string, acc_address: string, author: string, context: string) => {
     setGiftTarget({ questionId, acc_address, author, context });
@@ -274,6 +401,57 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
     setGiftTarget(null);
     setGiftAmount(5);
     setGiftNote("");
+  };
+
+  const getMentionableUsers = useCallback((answer: NonNullable<typeof activeQuestion>["answersList"][number]) => {
+    const people = new Map<string, string>(); // acc_address -> author name
+
+    if (answer.acc_address !== acc_address) {
+      people.set(answer.acc_address, answer.author);
+    }
+
+    answer.replies?.forEach((reply) => {
+      if (reply.acc_address !== acc_address) {
+        people.set(reply.acc_address, reply.author);
+      }
+    });
+
+    return Array.from(people.values());
+  }, [acc_address]);
+
+  const handleReplyDraftChange = (e: React.ChangeEvent<HTMLTextAreaElement>, answerId: string) => {
+    const value = e.target.value;
+    setAnswerReplyDraft(value);
+
+    const cursorPos = e.target.selectionStart ?? value.length;
+    const textBeforeCursor = value.slice(0, cursorPos);
+    const match = textBeforeCursor.match(/@([a-zA-Z0-9_]*)$/);
+
+    if (match) {
+      setMentionQuery(match[1]);
+      setMentionAnswerId(answerId);
+    } else {
+      setMentionQuery(null);
+      setMentionAnswerId(null);
+    }
+  };
+
+  const handleSelectMention = (name: string) => {
+    const textarea = replyTextareaRef.current;
+    if (!textarea) return;
+
+    const cursorPos = textarea.selectionStart ?? answerReplyDraft.length;
+    const textBeforeCursor = answerReplyDraft.slice(0, cursorPos);
+    const textAfterCursor = answerReplyDraft.slice(cursorPos);
+
+    const newBefore = textBeforeCursor.replace(/@([a-zA-Z0-9_]*)$/, `@${name} `);
+    const newValue = newBefore + textAfterCursor;
+
+    setAnswerReplyDraft(newValue);
+    setMentionQuery(null);
+    setMentionAnswerId(null);
+
+    requestAnimationFrame(() => textarea.focus());
   };
 
   return(
@@ -383,6 +561,12 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
                   id="reply-drawer"
                   value={replyDraft}
                   onChange={(event) => setReplyDraft(event.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmitAnswer();
+                    }
+                  }}
                   placeholder="Write a helpful answer..."
                 />
                 <div className={styles.answer_editor_actions}>
@@ -396,22 +580,105 @@ export default function Content_feed({ shared_link, acc_address, displayName, co
                   .sort((a, b) => b.gifts - a.gifts).map((answer) => (
                       <article key={`${answer.id}-${answer.author}`} className={styles.answer_item}>
                         <div className={styles.answer_item_head}>
-                          <strong>{answer.acc_address === acc_address ? "You" : answer.author + " " + answer.context + " Wallets"}</strong>
+                          <strong>{answer.acc_address === acc_address ? "Your Answer" : answer.author + " " + answer.context + " Wallets"}</strong>
                           <span>{formatTimeAgo(answer.time)}</span>
                         </div>
                         <p style={{ whiteSpace: "pre-line" }} >{answer.body}</p>
-                        {answer.acc_address !== acc_address && (
-                          <div className={styles.answer_item_footer}>
-                            <p style={{ margin: "5px 20px" }} >Upvote Score: {answer.gifts} points</p>
+                        <div className={styles.answer_item_footer}>
+                          <p style={{ margin: "5px 20px" }}>Upvote Score: {answer.gifts} points</p>
+                          <div style={{ display: "flex", gap: "0.5rem" }}>
                             <button
                               type="button"
-                              className={styles.gift_button}
-                              onClick={() => handleOpenGift(answer.id , answer.acc_address, answer.author, answer.context)}
+                              className={styles.reply_button}
+                              onClick={() =>
+                                replyingToAnswerId === answer.id
+                                  ? handleCancelReplyToAnswer()
+                                  : handleOpenReplyToAnswer(answer.id)
+                              }
                             >
-                              Gift XLM
+                              {replyingToAnswerId === answer.id ? "Cancel" : "Reply"}
                             </button>
+                            {answer.acc_address !== acc_address && (
+                              <button
+                                type="button"
+                                className={styles.gift_button}
+                                onClick={() => handleOpenGift(answer.id, answer.acc_address, answer.author, answer.context)}
+                              >
+                                Gift XLM
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {replyingToAnswerId === answer.id && (
+                          <div className={styles.reply_editor} style={{ position: "relative" }}>
+                            <textarea
+                              ref={replyTextareaRef}
+                              value={answerReplyDraft}
+                              onChange={(e) => handleReplyDraftChange(e, answer.id)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                  e.preventDefault();
+                                  handleSubmitReplyToAnswer(answer.id);
+                                }
+                              }}
+                              placeholder={`Reply to ${answer.author} or Mentions @...`}
+                            />
+
+                            {mentionAnswerId === answer.id && mentionQuery !== null && (
+                              (() => {
+                                const suggestions = getMentionableUsers(answer).filter((name) =>
+                                  name.toLowerCase().includes(mentionQuery.toLowerCase())
+                                );
+
+                                return suggestions.length > 0 ? (
+                                  <div className={styles.mention_dropdown}>
+                                    {suggestions.map((name) => (
+                                      <button
+                                        key={name}
+                                        type="button"
+                                        className={styles.mention_option}
+                                        onClick={() => handleSelectMention(name)}
+                                      >
+                                        @{name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                ) : null;
+                              })()
+                            )}
+
+                            <div className={styles.reply_editor_actions}>
+                              <button type="button" onClick={() => handleSubmitReplyToAnswer(answer.id)}>Reply</button>
+                            </div>
                           </div>
                         )}
+
+                        {answer.replies && answer.replies.length > 0 && (
+                          <div className={styles.reply_list}>
+                            {(expandedReplies[answer.id] ? answer.replies : answer.replies.slice(0, 1)).map((reply) => (
+                              <div key={reply.id} className={styles.reply_item}>
+                                <div className={styles.reply_item_head}>
+                                  <strong>{reply.acc_address === acc_address ? "You" : reply.author}</strong>
+                                  <span>{formatTimeAgo(reply.time)}</span>
+                                </div>
+                                <p>{renderWithMentions(reply.body)}</p>
+                              </div>
+                            ))}
+
+                            {answer.replies.length > 1 && (
+                              <button
+                                type="button"
+                                className={styles.show_more_replies}
+                                onClick={() => toggleRepliesExpanded(answer.id)}
+                              >
+                                {expandedReplies[answer.id]
+                                  ? "Show less"
+                                  : `Show ${answer.replies.length - 1} more repl${answer.replies.length - 1 === 1 ? "y" : "ies"}`}
+                              </button>
+                            )}
+                          </div>
+                        )}   
                       </article>
                     ))
                   ) : (

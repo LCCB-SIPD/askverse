@@ -12,6 +12,8 @@
     "answer" : "/services/supabase/answer",
     "hearts" : "/services/supabase/hearts",
     "upvote" : "/services/supabase/upvote",
-    "delete_post" : "/services/supabase/delete_post"
+    "delete_post" : "/services/supabase/delete_post",
+    "reply" : "/services/supabase/reply",
+    "retrieve_reply" : "/services/supabase/retrieve_reply"
   }
 }

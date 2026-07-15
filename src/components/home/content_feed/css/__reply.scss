@@ -1,0 +1,137 @@
+.reply_button {
+  padding: 0.6rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.reply_editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.reply_editor textarea {
+  min-height: 4rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 8, 15, 0.9);
+  color: rgba(255, 255, 255, 0.92);
+  resize: vertical;
+}
+
+.reply_editor_actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.reply_editor_actions button {
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+}
+
+.reply_list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.reply_item {
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.reply_item_head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.reply_item_head span {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.82rem;
+}
+
+.reply_item p {
+  margin-top: 0.35rem;
+  color: rgba(255, 255, 255, 0.76);
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+.show_more_replies {
+  align-self: flex-start;
+  margin-top: 0.2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #ff9ed7;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.show_more_replies:hover {
+  text-decoration: underline;
+}
+
+.mention {
+  color: #9d6bff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mention:hover {
+  text-decoration: underline;
+}
+
+.mention_dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.4rem;
+  border-radius: 0.85rem;
+  background: #1a1622;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  z-index: 5;
+  max-height: 10rem;
+  overflow-y: auto;
+}
+
+.mention_option {
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.6rem;
+  border: none;
+  background: transparent;
+  color: #d9c9ff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.mention_option:hover {
+  background: rgba(157, 107, 255, 0.15);
+}

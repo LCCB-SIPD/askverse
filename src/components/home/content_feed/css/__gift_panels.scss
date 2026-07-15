@@ -1,0 +1,96 @@
+.gift_panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: min(100%, 360px);
+  padding: 1rem;
+  border-radius: 1.25rem;
+  background: #120f1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  z-index: 2;
+}
+.gift_panel_head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.gift_panel_head p {
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 0.9rem;
+}
+
+.gift_panel_head h4 {
+  margin-top: 0.2rem;
+  font-size: 1.1rem;
+}
+
+.gift_panel_head button {
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.88);
+  cursor: pointer;
+}
+
+.gift_amounts {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.9rem;
+}
+
+.gift_amount,
+.gift_amount_active {
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.84);
+  cursor: pointer;
+}
+
+.gift_amount_active {
+  background: linear-gradient(135deg, rgba(255, 95, 187, 0.22), rgba(157, 107, 255, 0.22));
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.gift_note_label {
+  display: inline-block;
+  margin-top: 0.9rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+}
+
+.gift_panel textarea {
+  width: 100%;
+  min-height: 4.5rem;
+  margin-top: 0.55rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0d0b13;
+  color: rgba(255, 255, 255, 0.92);
+  resize: vertical;
+}
+
+.gift_panel_actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.gift_panel_actions button {
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.88);
+  cursor: pointer;
+}

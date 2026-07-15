@@ -1,0 +1,131 @@
+.post {
+  padding: 1.1rem;
+  border-radius: 1.5rem;
+}
+
+.delete_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  margin: 0.85rem 0;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 77, 77, 0.35);
+  background: rgba(255, 45, 45, 0.14);
+  color: #ff8a8a;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.delete_button:hover {
+  border-color: rgba(255, 77, 77, 0.55);
+  background: rgba(255, 45, 45, 0.22);
+}
+
+.delete_button:active {
+  transform: scale(0.97);
+}
+
+.post_head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.post_head p {
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.post_body {
+  margin-top: 0.8rem;
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.question_chip {
+  display: inline-flex;
+  margin-top: 0.9rem;
+  background: rgba(255, 95, 187, 0.14);
+  color: #ff9ed7;
+}
+
+.answer_block {
+  margin-top: 0.9rem;
+  padding: 1rem;
+  border-radius: 1.25rem;
+}
+
+.answer_block strong {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.answer_block p {
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.7;
+}
+
+.post_footer {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.post_footer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.84);
+  cursor: pointer;
+}
+
+.heart_button {
+  min-width: 2.75rem;
+}
+
+.gift_button {
+  min-width: 5.75rem;
+  cursor: pointer;
+  padding: 0.72rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 95, 187, 0.28);
+  background: linear-gradient(135deg, rgba(255, 95, 187, 0.2), rgba(157, 107, 255, 0.18));
+  color: #ffd6ef;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(157, 107, 255, 0.14);
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.gift_button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(157, 107, 255, 0.2);
+  filter: brightness(1.05);
+}
+
+.gift_button:active {
+  transform: translateY(0);
+}
+
+.heart {
+  width: 1rem;
+  height: 1rem;
+  fill: rgba(255, 255, 255, 0.82);
+  flex: 0 0 auto;
+}
+
+.heart_active {
+  width: 1rem;
+  height: 1rem;
+  fill: #ff6fb0;
+  filter: drop-shadow(0 0 10px rgba(255, 111, 176, 0.35));
+  flex: 0 0 auto;
+}

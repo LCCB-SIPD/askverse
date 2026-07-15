@@ -171,9 +171,12 @@ npm run start     # run production build
 
 ## Roadmap
 
+- [x] Reply to the Answers
 - [x] Mainnet deployment on Stellar
 - [ ] Soroban smart contract integration for on-chain gift/score verification (`askverse_gifts` contract in progress)
-- [ ] Notifications for gifted answers
+- [ ] Notifications for gifted answers and via email
+- [ ] Notifications for Replied Answers and via email
+- [ ] Notifications for Answer Reponse and via email
 - [ ] Mobile-responsive polish
 - [ ] Expanded moderation tools for community feeds
 
@@ -189,10 +192,13 @@ Designed and developed the platform; built the frontend and backend routes; inte
 - **Video Demo:** https://drive.google.com/file/d/1NMawIzTk_0krOAeY8xzMi5ykWmgvEO3d/view?usp=sharing
 - **Pitch Deck:** https://canva.link/qnrbb2f8ll3fq7l
 - **Github:** https://github.com/cordystackx
-- **XTwitter:** https://x.com/cordystackx
+- **XTwitter CordyStackx:** https://x.com/cordystackx
+- **XTwitter AskVerse:** https://x.com/AskVersePH
 - **LinkedIn:** www.linkedin.com/in/marc-giestin-louis-cordova-657849276
 - **Telegram:** https://t.me/cordystackx
 - **Wallet Address:** GDBDNKLOEKY7SGXOM64G26VA65R4WXZDTDDO6MXD5QU4NGYRIWRERLOT
+- **Email:** cordystackx@gmail.com
+
 
 ## License
 

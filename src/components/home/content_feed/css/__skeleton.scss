@@ -1,0 +1,83 @@
+.skeleton_head,
+.skeleton_body,
+.skeleton_actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.skeleton_head {
+  align-items: center;
+}
+
+.skeleton_body {
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.skeleton_actions {
+  margin-top: 1rem;
+}
+
+.skeleton_stack {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.skeleton_avatar,
+.skeleton_line,
+.skeleton_line_short,
+.skeleton_line_medium,
+.skeleton_pill,
+.skeleton_pill_small {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+  background-size: 200% 100%;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.skeleton_avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  flex: 0 0 auto;
+}
+
+.skeleton_line,
+.skeleton_line_short,
+.skeleton_line_medium {
+  height: 1rem;
+  border-radius: 999px;
+}
+
+.skeleton_line {
+  width: 100%;
+}
+
+.skeleton_line_short {
+  width: min(44%, 12rem);
+}
+
+.skeleton_line_medium {
+  width: min(68%, 22rem);
+}
+
+.skeleton_pill,
+.skeleton_pill_small {
+  height: 2.5rem;
+  border-radius: 999px;
+}
+
+.skeleton_pill {
+  width: 8.5rem;
+}
+
+.skeleton_pill_small {
+  width: 5rem;
+}
+
+@keyframes pulse {
+  to {
+    background-position: -200% 0;
+  }
+}

@@ -1,4 +1,5 @@
 allowBuilds:
+  '@parcel/watcher': true
   '@reown/appkit': false
   protobufjs: true
   sharp: true
