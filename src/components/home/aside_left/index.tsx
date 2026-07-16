@@ -28,6 +28,7 @@ function getProfileInitial(displayName?: string, username?: string) {
 export default function Aside_left({ upvote, displayName, username, context, evm, stellar, setDisplayName, setUsername, setFilter, balance } : Aside_leftProps) {
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { disconnectAll } = useDisconnectWallets();
   const [loading, setLoading] = useState(false);
   const profileInitial = getProfileInitial(displayName, username);
@@ -60,28 +61,30 @@ export default function Aside_left({ upvote, displayName, username, context, evm
               <p style={{ margin: "0.2rem" }}>@{username}</p>
             </div>
           </button>
-          <button type="button" className={styles.burger} aria-label="Open navigation">
+          <button type="button" className={styles.burger} aria-label="Open navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen((prev) => !prev)}>
             <span />
             <span />
             <span />
           </button>
         </div>
-        <div className={styles.stats}>
-          <article>
-            <span>Balance</span>
-            <strong>{Number(balance || 0).toFixed(2)}</strong>
-          </article>
-          <article>
-            <span>UpVote Score</span>
-            <strong>{upvote || 0}</strong>
-          </article>
+        <div className={`${styles.mobile_menu} ${menuOpen ? styles.mobile_menu_open : ""}`}>
+          <div className={styles.stats}>
+            <article>
+              <span>Balance</span>
+              <strong>{Number(balance || 0).toFixed(2)}</strong>
+            </article>
+            <article>
+              <span>UpVote Score</span>
+              <strong>{upvote || 0}</strong>
+            </article>
+          </div>
+          <nav className={styles.nav}>
+            <ul>
+              <li onClick={() => { setFilter(false); setMenuOpen(false); }}>Feeds</li>
+              <li onClick={() => { setFilter(true); setMenuOpen(false); }}>My Questions</li>
+            </ul>
+          </nav>
         </div>
-        <nav className={styles.nav}>
-          <ul>
-            <li onClick={() => {setFilter(false);}}>Feeds</li>
-            <li onClick={() => {setFilter(true);}}>My Questions</li>
-          </ul>
-        </nav>
       </div>
 
       {profileOpen && (

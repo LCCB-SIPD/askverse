@@ -76,6 +76,7 @@
     top: auto;
     right: auto;
     width: 100%;
+    display: none;
   }
 
   .burger {

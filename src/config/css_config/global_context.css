@@ -117,7 +117,6 @@
   .homepage_shell {
     flex-direction: column;
     padding: 1rem;
-    padding-top: calc(var(--home-header-height) + 0.75rem);
     min-height: auto;
   }
 }
