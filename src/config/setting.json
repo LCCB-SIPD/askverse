@@ -1,0 +1,20 @@
+{
+    "title" : "AskVerse - A Decentralized Knowledge-to-Earn Platform",
+    "description" : "A Decentralized Knowledge-to-Earn Platform Powered by the Stellar Development Foundation and the Stellar ecosystem",
+    "domain__links": "https://askverse-pi.vercel.app/",
+    "openGraph": "https://askverse-pi.vercel.app/AskVerse_ads.png",
+    "wallet__connect_PRID": {
+        "Wallet__Connect": "67d2d578d855e579911095f9db6d4b29",
+        "Based__Sepolia": "",
+        "Stellar" : ""
+    },
+    "links__src" : {
+        "Social__links" : {
+            "linked_in" : "https://www.linkedin.com/in/marc-giestin-louis-cordova-657849276",
+            "github" : "https://github.com/cordyStackX",
+            "facebook" : "https://www.facebook.com/cordyStackX/",
+            "twitter" : "https://x.com/cordyStackX",
+            "tiktok" : "https://www.tiktok.com/@cordystackx"
+        }
+    }
+}

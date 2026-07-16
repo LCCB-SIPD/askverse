@@ -173,12 +173,14 @@ npm run start     # run production build
 
 - [x] Reply to the Answers
 - [x] Mainnet deployment on Stellar
-- [ ] Soroban smart contract integration for on-chain gift/score verification (`askverse_gifts` contract in progress)
+- [x] Soroban smart contract integration for on-chain gift/score verification
+- [x] MetaData SEO Ranking through Google Search
 - [ ] Notifications for gifted answers and via email
-- [ ] Notifications for Replied Answers and via email
-- [ ] Notifications for Answer Reponse and via email
+- [ ] Notifications for replied answers and via email
+- [ ] Notifications for answer reponses and via email
 - [ ] Mobile-responsive polish
-- [ ] Expanded moderation tools for community feeds
+- [ ] User Profile DashBoard Milestone
+- [ ] Beta Version Release
 
 ## Team
 
